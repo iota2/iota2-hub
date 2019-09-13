@@ -1,0 +1,4 @@
+#!/bin/bash
+scriptname=${0##*/}
+scriptdir=${0%*$scriptname}
+${scriptdir}md5 -r $@ 

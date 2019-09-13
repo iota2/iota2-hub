@@ -1,0 +1,51 @@
+# Prerequisites #
+*.d
+
+# Object files #
+*.o
+*.obj
+*.elf
+*.bin
+
+# Linker output #
+*.ilk
+*.map
+
+# Libraries #
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs) #
+*.dll
+*.so
+*.so.*
+
+# Executables #
+*.exe
+*.out
+*.hex
+
+# System #
+*~
+*.swp
+*.swo
+.depend
+tags
+
+# Git #
+*.orig
+*.rej
+*.patch
+
+# Project #
+.cproject
+.project
+.settings/
+
+# Output #
+build/
+
+# as some tools might contain object files or libraries, 
+# include everything tools directry may have
+!tools/**
+
