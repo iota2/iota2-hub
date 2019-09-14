@@ -23,7 +23,7 @@
 # Free Software, Hell Yeah!
 #
 
-NAME           := IOTA2_CONN
+NAME           := IOTA2_HUB
 
 GLOBAL_DEFINES := $(NAME)
 GLOBAL_DEFINES += STM32F40XX
@@ -57,25 +57,29 @@ export GDB     := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gdb
 export SIZE    := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)size
 
 OUTPUT_ROOT = build/
-OUTPUT      = $(OUTPUT_ROOT)/IOTA2_CONN/binary
-BIN         = $(OUTPUT)/IOTA2_CONN.bin
+OUTPUT      = $(OUTPUT_ROOT)/IOTA2_HUB/binary
+BIN         = $(OUTPUT)/IOTA2_HUB.bin
 
 GIT_HASH   := $(shell git describe --dirty --always --abbrev=0)
 
-CPU         = -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
+CPU         = -mthumb -mcpu=cortex-m4 -mfloat-abi=hard
 STM32_OPT   = -DSTM32F407xx -DSTM32F40XX -DUSE_STDPERIPH_DRIVER -DUSE_FULL_ASSERT
 OTHER_OPT   = "-D__weak=__attribute__((weak))" "-D__packed=__attribute__((__packed__))" -DENABLE_ASSERT -DENABLE_DEBUG
 LDSCRIPT    = ./STM32F407IGTx_FLASH.ld
 
-DRV_DIR    := drivers/
+DRV_DIR    := ./drivers
+MDL_DIR    := ./middleware
 
 LIBINC     := -Iapp/inc
 LIBINC     += -I$(DRV_DIR)/STM32F4xx_StdPeriph_Driver/inc
-LIBINC     += -Idrivers/CMSIS/Include
-LIBINC     += -Idrivers/CMSIS/Device/ST/STM32F4xx/Include
+LIBINC     += -I$(DRV_DIR)/CMSIS/Include
+LIBINC     += -I$(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Include
+LIBINC     += -I$(MDL_DIR)/third_party/FreeRTOSv10.2.1/FreeRTOS/Source/include
+LIBINC     += -I$(MDL_DIR)/third_party/FreeRTOSv10.2.1/FreeRTOS/Source/portable/GCC/ARM_CM4F
 
-LIBS       := drivers/STM32F4xx_StdPeriph_Driver/lib_stm32f4xx_stdperiph.a
-
+LIBS       := ./$(DRV_DIR)/STM32F4xx_StdPeriph_Driver/lib_stm32f4xx_stdperiph.a
+LIBS       += ./$(MDL_DIR)/third_party/FreeRTOSv10.2.1/FreeRTOS/lib_freertos_v10_2_1.a
+LIBS       += -lm
 INCLUDES    = $(LIBINC)
 CFLAGS     += $(CPU) $(STM32_OPT) $(OTHER_OPT)
 CFLAGS     += -Os -Wall -fno-common -fno-short-enums
@@ -97,8 +101,8 @@ VPATH      += drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7
 ASMS        = drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_stm32f40xx.s
 		
 SRCS        = drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c \
-		      app/src/main.c \
-		      app/src/stm32f4xx_it.c
+              app/src/main.c \
+              app/src/stm32f4xx_it.c
 
 ASMS_TEMP  := $(notdir $(ASMS))
 SRCS_TEMP  := $(notdir $(SRCS))
@@ -131,29 +135,32 @@ test: $(AOBJS) $(OBJS)
 	@echo ----- DEP -----
 	@echo $(DEPS)
 
-$(BIN): $(OUTPUT)/IOTA2_CONN.out
-	$(OBJCOPY) $(OBJCOPYFLAGS) $(OUTPUT)/IOTA2_CONN.out $(BIN)
-	$(OBJCOPY) -O ihex $(OUTPUT)/IOTA2_CONN.out $(OUTPUT)/IOTA2_CONN.hex
-	$(OBJDUMP) $(OBJDUMPFLAGS) $(OUTPUT)/IOTA2_CONN.out > $(OUTPUT)/IOTA2_CONN.list
-	$(SIZE) $(OUTPUT)/IOTA2_CONN.out
+$(BIN): $(OUTPUT)/IOTA2_HUB.out
+	$(OBJCOPY) $(OBJCOPYFLAGS) $(OUTPUT)/IOTA2_HUB.out $(BIN)
+	$(OBJCOPY) -O ihex $(OUTPUT)/IOTA2_HUB.out $(OUTPUT)/IOTA2_HUB.hex
+	$(OBJDUMP) $(OBJDUMPFLAGS) $(OUTPUT)/IOTA2_HUB.out > $(OUTPUT)/IOTA2_HUB.list
+	$(SIZE) $(OUTPUT)/IOTA2_HUB.out
 	@echo HEAD GIT HASH : $(GIT_HASH)
 	@echo Make finished
 
-$(OUTPUT)/IOTA2_CONN.out: $(LIBS) $(AOBJS) $(OBJS)
+$(OUTPUT)/IOTA2_HUB.out: $(LIBS) $(AOBJS) $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(AOBJS) $(OBJS) $(LIBS)
 
 $(LIBS): libs
 
 libs:
 	@$(MAKE) -C $(DRV_DIR)
+	@$(MAKE) -C $(MDL_DIR)
 
 libclean: clean
 	@$(MAKE) -C $(DRV_DIR) clean
+	@$(MAKE) -C $(MDL_DIR) clean
 
 clean:
 	@echo Removing executables...
 	rm -fr $(OUTPUT_ROOT)
 	@$(MAKE) -C $(DRV_DIR) clean
+	@$(MAKE) -C $(MDL_DIR) clean
 	
 $(OUTPUT):
 	mkdir -p $(OUTPUT)
