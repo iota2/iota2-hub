@@ -36,6 +36,44 @@ GPIO_InitTypeDef  GPIO_InitStructure;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
+
+/**
+  * @brief  User task
+  * @param  pvParameters : Imported parameters to be used in task
+  * @retval None
+  */
+void HUB_taskUSER( void * pvParameters )
+{
+    /* The parameter value is expected to be 1 as 1 is passed in the
+    pvParameters value in the call to xTaskCreate() below. */
+    configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+
+    /* GPIOI Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE);
+
+    /* Configure PI8 and PI9 in output pushpull mode */
+    GPIO_InitStructure.GPIO_Pin = LED1_PIN | LED2_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOI, &GPIO_InitStructure);
+
+    for( ;; )
+    {
+        /* Task code goes here. */
+      /* Set PI8 and PI9 */
+      GPIOI->BSRRL = LED1_PIN | LED2_PIN;
+      /* Reset PI8 and PI9 */
+      GPIOI->BSRRH = LED1_PIN | LED2_PIN;
+
+      /* Set PI8 and PI9 */
+      GPIOI->BSRRL = LED1_PIN | LED2_PIN;
+      /* Reset PI8 and PI9 */
+      GPIOI->BSRRH = LED1_PIN | LED2_PIN;
+    }
+}
+
 /**
   * @brief  Main program
   * @param  None
@@ -43,33 +81,22 @@ GPIO_InitTypeDef  GPIO_InitStructure;
   */
 int main(void)
 {
-  /* GPIOI Peripheral clock enable */
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE);
+  BaseType_t    HUB_statusHandle;
+  TaskHandle_t  HUB_taskHandleUSER = NULL;
 
-  /* Configure PI8 and PI9 in output pushpull mode */
-  GPIO_InitStructure.GPIO_Pin = LED1_PIN | LED2_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(GPIOI, &GPIO_InitStructure);
+  //Create user task
+  HUB_statusHandle = xTaskCreate( HUB_taskUSER, "HUB",  HUB_taskStckDepthUSER,
+      ( void * ) 1, HUB_taskPritorityUSER, &HUB_taskHandleUSER );
+  if ( HUB_statusHandle != pdPASS ) {
+    return 0;
+  }
 
-  /* To achieve GPIO toggling maximum frequency, the following  sequence is mandatory. 
-     You can monitor PI8 or PI9 on the scope to measure the output signal. 
-     If you need to fine tune this frequency, you can add more GPIO set/reset 
-     cycles to minimize more the infinite loop timing.
-     This code needs to be compiled with high speed optimization option.  */  
+
+  //Start the scheduler
+  vTaskStartScheduler();
+
   while (1)
   {
-    /* Set PI8 and PI9 */
-    GPIOI->BSRRL = LED1_PIN | LED2_PIN;
-    /* Reset PI8 and PI9 */
-    GPIOI->BSRRH = LED1_PIN | LED2_PIN;
-
-    /* Set PI8 and PI9 */
-    GPIOI->BSRRL = LED1_PIN | LED2_PIN;
-    /* Reset PI8 and PI9 */
-    GPIOI->BSRRH = LED1_PIN | LED2_PIN;
   }
 }
 
