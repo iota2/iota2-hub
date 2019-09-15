@@ -46,7 +46,7 @@ SRCS	=	./src/misc.c \
 				./src/stm32f4xx_rng.c \
 				./src/stm32f4xx_rtc.c \
 				./src/stm32f4xx_sdio.c \
-				./src/stm32f4xx_spi.c \	
+				./src/stm32f4xx_spi.c \
 				./src/stm32f4xx_syscfg.c \
 				./src/stm32f4xx_tim.c \
 				./src/stm32f4xx_usart.c \
