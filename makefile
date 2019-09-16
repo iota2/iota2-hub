@@ -1,6 +1,6 @@
 #
-# @date         07-09-2019
 # @author       iota square <i2>
+# @date         07-09-2019
 #  _       _        ___  
 # (_)     | |      |__ \.
 #  _  ___ | |_ __ _   ) |
@@ -63,7 +63,7 @@ BIN         = $(OUTPUT)/IOTA2_HUB.bin
 GIT_HASH   := $(shell git describe --dirty --always --abbrev=0)
 
 CPU         = -mthumb -mcpu=cortex-m4 -mfloat-abi=hard
-STM32_OPT   = -DSTM32F407xx -DSTM32F40XX -DUSE_STDPERIPH_DRIVER -DUSE_FULL_ASSERT
+STM32_OPT   = -DSTM32F407xx -DSTM32F407xx -DUSE_FULL_ASSERT
 OTHER_OPT   = "-D__weak=__attribute__((weak))" "-D__packed=__attribute__((__packed__))" -DENABLE_ASSERT -DENABLE_DEBUG
 LDSCRIPT    = ./STM32F407IGTx_FLASH.ld
 
@@ -71,13 +71,13 @@ DRV_DIR    := ./drivers
 MDL_DIR    := ./middleware
 
 LIBINC     := -Iapp/inc
-LIBINC     += -I$(DRV_DIR)/STM32F4xx_StdPeriph_Driver/inc
+LIBINC     += -I$(DRV_DIR)/STM32F4xx_HAL_Driver/Inc
 LIBINC     += -I$(DRV_DIR)/CMSIS/Include
 LIBINC     += -I$(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Include
 LIBINC     += -I$(MDL_DIR)/third_party/FreeRTOSv10.2.1/FreeRTOS/Source/include
 LIBINC     += -I$(MDL_DIR)/third_party/FreeRTOSv10.2.1/FreeRTOS/Source/portable/GCC/ARM_CM4F
 
-LIBS       := ./$(DRV_DIR)/STM32F4xx_StdPeriph_Driver/lib_stm32f4xx_stdperiph.a
+LIBS       := ./$(DRV_DIR)/STM32F4xx_HAL_Driver/lib_stm32f4xx_hal.a
 LIBS       += ./$(MDL_DIR)/third_party/FreeRTOSv10.2.1/FreeRTOS/lib_freertos_v10_2_1.a
 LIBS       += -lm
 INCLUDES    = $(LIBINC)
@@ -96,9 +96,9 @@ OBJDUMPFLAGS    = -S
 
 VPATH       = app/src/:
 VPATH      += drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates:
-VPATH      += drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7
+VPATH      += drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc
 
-ASMS        = drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_stm32f40xx.s
+ASMS        = drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f407xx.s
 		
 SRCS        = drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c \
               app/src/main.c \

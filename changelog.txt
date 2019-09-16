@@ -1,6 +1,6 @@
 #
-# @date         07-09-2019
 # @author       iota square <i2>
+# @date         07-09-2019
 #  _       _        ___  
 # (_)     | |      |__ \.
 #  _  ___ | |_ __ _   ) |
@@ -23,8 +23,18 @@
 # Free Software, Hell Yeah!
 #
 
-[ 07-09-2019 ]
-* Basic project build with stdperiph and controller clock configurations using main Makefile
+[ 13-09-2019 ]
+    [HUB-1][SETUP] Initial commit for IOTA2-HUB Connectivity project
+
+[ 14-09-2019 ]
+    [HUB-9][RTOS] Integrated FreeRTOS ver 10.2.1 to HUB
+    [HUB-10][COSMETIC] Change All file delimiters to <UNIX>
+
+[ 15-09-2019 ]
+    [HUB-12][SETUP] Update MCU Configuration for HUB
+
+[ 16-09-2019 ]
+    [HUB-13][SETUP] Integrate STM32F4XX_HAL library to HUB
 
 # *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
 

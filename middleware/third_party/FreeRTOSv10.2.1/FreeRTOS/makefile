@@ -1,6 +1,6 @@
 #
-# @date         14-09-2019
 # @author       iota square <i2>
+# @date         14-09-2019
 #  _       _        ___  
 # (_)     | |      |__ \.
 #  _  ___ | |_ __ _   ) |
@@ -32,13 +32,13 @@ endif
 LIB_OUT = lib_freertos_v10_2_1.a
 
 SRCS =	./Source/portable/MemMang/heap_4.c \
-		./Source/portable/GCC/ARM_CM4F/port.c \
-		./Source/event_groups.c \
-		./Source/list.c \
-		./Source/queue.c \
-		./Source/stream_buffer.c \
-		./Source/tasks.c \
-		./Source/timers.c 
+				./Source/portable/GCC/ARM_CM4F/port.c \
+				./Source/event_groups.c \
+				./Source/list.c \
+				./Source/queue.c \
+				./Source/stream_buffer.c \
+				./Source/tasks.c \
+				./Source/timers.c 
 
 LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS))) 
 

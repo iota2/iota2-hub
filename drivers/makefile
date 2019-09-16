@@ -1,6 +1,6 @@
 #
-# @date         07-09-2019
 # @author       iota square <i2>
+# @date         07-09-2019
 #  _       _        ___  
 # (_)     | |      |__ \.
 #  _  ___ | |_ __ _   ) |
@@ -32,7 +32,7 @@ endif
 CFLAGS := $(patsubst -I%,-I../../%,$(CFLAGS))
 
 SUBDIRS := CMSIS \
-           STM32F4xx_StdPeriph_Driver
+           STM32F4xx_HAL_Driver
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: ${SUBDIRS}

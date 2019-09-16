@@ -1,6 +1,6 @@
 /**
- * @date        07-09-2019
  * @author      iota square <i2>
+ * @date        07-09-2019
  *  _       _        ___  
  * (_)     | |      |__ \.
  *  _  ___ | |_ __ _   ) |
@@ -30,7 +30,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
-#include "stm32f4xx_conf.h"
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_conf.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -43,8 +44,8 @@
 #define IOTA2_CONN_EMB_HOTFIX_VERSION_NUMBER    ( 0 ) //a value between 0-65535
 
 /* Exported define -----------------------------------------------------------*/
-#define LED1_PIN                                GPIO_Pin_8
-#define LED2_PIN                                GPIO_Pin_9
+#define HUB_LED1                                GPIO_PIN_8
+#define HUB_LED2                                GPIO_PIN_9
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
