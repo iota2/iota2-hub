@@ -4,6 +4,9 @@
 
 <i2.iotasquare@gmail.com>
 
+[![BSD licensed](https://img.shields.io/badge/license-GPL3-blue.svg)](https://raw.githubusercontent.com/iota2/iota2-hub/develop/LICENSE)
+[![Build Status](https://travis-ci.org/iota2/iota2-hub.svg?branch=develop)](https://travis-ci.org/iota2/iota2-hub)
+
 ## IOTA2-HUB
 IOTA2-HUB is an Ethernet connectivity module that is able to 
 monitorvarious components and provides multiple options to 
