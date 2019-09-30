@@ -31,7 +31,7 @@ endif
 
 CFLAGS := $(patsubst -I%,-I../../%,$(CFLAGS))
 
-SUBDIRS := third_party
+SUBDIRS := FreeRTOSv10.2.1
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: ${SUBDIRS}

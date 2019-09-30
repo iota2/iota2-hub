@@ -31,8 +31,8 @@ endif
 
 CFLAGS := $(patsubst -I%,-I../../%,$(CFLAGS))
 
-SUBDIRS := CMSIS \
-           STM32F4xx_HAL_Driver
+SUBDIRS := CMSIS
+SUBDIRS += STM32F4xx_HAL_Driver
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: ${SUBDIRS}

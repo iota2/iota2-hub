@@ -115,7 +115,7 @@ void UsageFault_Handler(void)
   * @param  None
   * @retval None
   */
-void SVC_Handler(void)
+__weak void SVC_Handler(void)
 {
 }
 
@@ -133,7 +133,7 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-void PendSV_Handler(void)
+__weak void PendSV_Handler(void)
 {
 }
 
@@ -142,7 +142,7 @@ void PendSV_Handler(void)
   * @param  None
   * @retval None
   */
-void SysTick_Handler(void)
+__weak void SysTick_Handler(void)
 {
 }
 

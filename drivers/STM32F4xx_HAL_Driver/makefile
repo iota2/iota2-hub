@@ -31,28 +31,31 @@ endif
 
 LIB_OUT = lib_stm32f4xx_hal.a
 
-SRCS	=	./Src/stm32f4xx_hal.c \
-				./Src/stm32f4xx_hal_adc.c \
-				./Src/stm32f4xx_hal_cortex.c \
-				./Src/stm32f4xx_hal_crc.c \
-				./Src/stm32f4xx_hal_cryp.c \
-				./Src/stm32f4xx_hal_dma.c \
-				./Src/stm32f4xx_hal_eth.c \
-				./Src/stm32f4xx_hal_exti.c \
-				./Src/stm32f4xx_hal_flash.c \
-				./Src/stm32f4xx_hal_gpio.c \
-				./Src/stm32f4xx_hal_hash.c \
-				./Src/stm32f4xx_hal_i2c.c \
-				./Src/stm32f4xx_hal_iwdg.c \
-				./Src/stm32f4xx_hal_pwr.c \
-				./Src/stm32f4xx_hal_rcc.c \
-				./Src/stm32f4xx_hal_rng.c \
-				./Src/stm32f4xx_hal_rtc.c \
-				./Src/stm32f4xx_hal_spi.c \
-				./Src/stm32f4xx_hal_tim.c \
-				./Src/stm32f4xx_hal_uart.c \
-				./Src/stm32f4xx_hal_usart.c \
-				./Src/stm32f4xx_hal_wwdg.c
+SRCS := ./Src/stm32f4xx_hal.c
+SRCS += ./Src/stm32f4xx_hal_adc.c
+SRCS += ./Src/stm32f4xx_hal_cortex.c
+SRCS += ./Src/stm32f4xx_hal_crc.c
+SRCS += ./Src/stm32f4xx_hal_cryp.c
+SRCS += ./Src/stm32f4xx_hal_dma.c
+SRCS += ./Src/stm32f4xx_hal_eth.c
+SRCS += ./Src/stm32f4xx_hal_exti.c
+SRCS += ./Src/stm32f4xx_hal_flash.c
+SRCS += ./Src/stm32f4xx_hal_gpio.c
+SRCS += ./Src/stm32f4xx_hal_hash.c
+SRCS += ./Src/stm32f4xx_hal_i2c.c
+SRCS += ./Src/stm32f4xx_hal_iwdg.c
+SRCS += ./Src/stm32f4xx_hal_pwr.c
+SRCS += ./Src/stm32f4xx_hal_pwr_ex.c
+SRCS += ./Src/stm32f4xx_hal_rcc.c
+SRCS += ./Src/stm32f4xx_hal_rcc_ex.c
+SRCS += ./Src/stm32f4xx_hal_rng.c
+SRCS += ./Src/stm32f4xx_hal_rtc.c
+SRCS += ./Src/stm32f4xx_hal_rtc_ex.c
+SRCS += ./Src/stm32f4xx_hal_spi.c
+SRCS += ./Src/stm32f4xx_hal_tim.c
+SRCS += ./Src/stm32f4xx_hal_uart.c
+SRCS += ./Src/stm32f4xx_hal_usart.c
+SRCS += ./Src/stm32f4xx_hal_wwdg.c
 
 LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS))) 
 

@@ -1,11 +1,11 @@
 /**
  * @author      iota square <i2>
  * @date        07-09-2019
- *  _       _        ___  
+ *  _       _        ___
  * (_)     | |      |__ \.
  *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / / 
- * | | (_) | || (_| |/ /_ 
+ * | |/ _ \| __/ _` | / /
+ * | | (_) | || (_| |/ /_
  * |_|\___/ \__\__,_|____|
  *
  * @License     GNU GPU v3
@@ -35,6 +35,17 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+/* HAL Interface Drivers -----------------------------------------------------*/
+#include "i2_stm32f4xx_hal_clock.h"
+#include "i2_stm32f4xx_hal_gpio.h"
+#include "i2_stm32f4xx_hal_rtc.h"
+#include "i2_stm32f4xx_hal_spi.h"
+#include "i2_stm32f4xx_hal_uart.h"
+
+/* Drivers -------------------------------------------------------------------*/
+#include "i2_fifo.h"
+#include "i2_led.h"
+
 /*
  * This is the IOTA2-HUB SW version in format MAJOR.MINOR.HOTFIX
  * Note that Hotfix is 16 bit and Minor and Major is 8 bit.
@@ -44,14 +55,11 @@
 #define IOTA2_CONN_EMB_HOTFIX_VERSION_NUMBER    ( 0 ) //a value between 0-65535
 
 /* Exported define -----------------------------------------------------------*/
-#define HUB_LED1                                GPIO_PIN_8
-#define HUB_LED2                                GPIO_PIN_9
+#define HUB_taskPritorityUSER                   configMIN_PRIORITIES
+#define HUB_taskStckDepthUSER                   ( 10 )
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-#define HUB_taskPritorityUSER                   configMIN_PRIORITIES
-
-#define HUB_taskStckDepthUSER                   ( 10 )
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 
