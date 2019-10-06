@@ -1,6 +1,7 @@
 #!/bin/bash
 # @author       iota square <i2> 
 # @date         30-09-2019
+# @file         .travis.sh
 #  _       _        ___  
 # (_)     | |      |__ \.
 #  _  ___ | |_ __ _   ) |

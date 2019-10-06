@@ -1,6 +1,7 @@
 #
 # @author       iota square <i2>
 # @date         07-09-2019
+# @file         makefile
 #  _       _        ___  
 # (_)     | |      |__ \.
 #  _  ___ | |_ __ _   ) |
@@ -27,12 +28,14 @@ NAME           := IOTA2_HUB
 
 GLOBAL_DEFINES := $(NAME)
 GLOBAL_DEFINES += STM32F40XX
-GLOBAL_DEFINES += USE_STDPERIPH_DRIVER
 export GLOBAL_DEFINES
 
 TOOLS_ROOT         := $(CURDIR)/tools
 TOOLCHAIN_PREFIX   := arm-none-eabi-
 TOOLCHAIN_PATH     := $(TOOLS_ROOT)/ARM_GNU/Linux64/bin/
+
+# MAP file parser
+MAP_FILE_PARSER    := $(TOOLS_ROOT)/utilities/map_parser.pl
 
 # Default disable make verbose level
 VERBOSE_LEVEL      ?= 0
@@ -62,7 +65,14 @@ OUTPUT      = $(OUTPUT_ROOT)/$(NAME)/release
 else
 OUTPUT      = $(OUTPUT_ROOT)/$(NAME)/debug
 endif
+
+# Executables ------------------------------------------------------------
+ELF         = $(OUTPUT)/$(NAME).elf
 BIN         = $(OUTPUT)/$(NAME).bin
+HEX         = $(OUTPUT)/$(NAME).hex
+OUT         = $(OUTPUT)/$(NAME).out
+LST         = $(OUTPUT)/$(NAME).list
+MAP         = $(OUTPUT)/$(NAME).map
 
 GIT_HASH   := $(shell git describe --dirty --always --abbrev=0)
 
@@ -148,13 +158,20 @@ OBJS       := $(patsubst %.c, $(OUTPUT_ROOT)/%.o, $(SRCS_TEMP) )
 DEPS        = $(AOBJS:.o=.d)
 DEPS       += $(OBJS:.o=.d)
 
-all: $(OUTPUT) $(BIN)
+all: $(OUTPUT) $(ELF) $(BIN) $(HEX)
+	$(OBJDUMP) $(OBJFLAGS_D) $(OUT) > $(LST)
+	$(SIZE) $(ELF)
+	@echo "\n"
+	$(MAP_FILE_PARSER) -w $(MAP)
+	@echo HEAD GIT HASH : $(GIT_HASH)
+	@echo Make finished
 
 flash: $(BIN)
-	@echo "Starting Flashing..."
-	st-flash --format binary write $< 0x8025800
+	@echo "Starting Flashing Target..."
+	st-flash --format binary write $< 0x8000000
 
 erase:
+	@echo "Erasing Target..."
 	st-flash erase
 
 test: $(AOBJS) $(OBJS)
@@ -169,15 +186,16 @@ test: $(AOBJS) $(OBJS)
 	@echo ----- DEP -----
 	@echo $(DEPS)
 
-$(BIN): $(OUTPUT)/$(NAME).out
-	$(OBJCOPY) $(OBJFLAGS_C) $(OUTPUT)/$(NAME).out $(BIN)
-	$(OBJCOPY) -O ihex $(OUTPUT)/$(NAME).out $(OUTPUT)/$(NAME).hex
-	$(OBJDUMP) $(OBJFLAGS_D) $(OUTPUT)/$(NAME).out > $(OUTPUT)/$(NAME).list
-	$(SIZE) $(OUTPUT)/$(NAME).hex $(OUTPUT)/$(NAME).out
-	@echo HEAD GIT HASH : $(GIT_HASH)
-	@echo Make finished
+$(ELF): $(OUT) $(LIBS) $(AOBJS) $(OBJS)
+	$(CC) $(AOBJS) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
 
-$(OUTPUT)/$(NAME).out: $(LIBS) $(AOBJS) $(OBJS)
+$(HEX): $(ELF)
+	$(OBJCOPY) -O ihex $< $@
+
+$(BIN): $(ELF)
+	$(OBJCOPY) -O binary -S $< $@
+
+$(OUT): $(LIBS) $(AOBJS) $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(AOBJS) $(OBJS) $(LIBS)
 
 $(LIBS): libs
@@ -196,7 +214,8 @@ get_mem_map:
 	@echo "Detailed Memory Mapping:"
 	$(SIZE) $(AOBJS) $(OBJS) $(LIBS)
 	@echo "\n\nExecutables:"
-	$(SIZE) $(OUTPUT)/$(NAME).out $(OUTPUT)/$(NAME).hex
+	$(SIZE) $(ELF) $(HEX)
+	$(MAP_FILE_PARSER) -w $(MAP)
 
 clean:
 	@echo Removing executables...
