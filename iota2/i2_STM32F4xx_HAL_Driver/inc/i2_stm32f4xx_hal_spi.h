@@ -119,8 +119,8 @@ i2_error i2_spi_rx_raw( i2_spi_inst_t *inst, i2_spi_data_width_t data_witdh,
                         i2_spi_first_bit_t first_bit,
                         uint8_t *rxbuf, int32_t size, uint32_t timeout);
 
-i2_error spi_cs_assert(i2_spi_inst_t *inst, uint32_t timeout);
-i2_error spi_cs_deassert(i2_spi_inst_t *inst);
+i2_error i2_spi_cs_assert(i2_spi_inst_t *inst, uint32_t timeout);
+i2_error i2_spi_cs_deassert(i2_spi_inst_t *inst);
 
 /************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
 

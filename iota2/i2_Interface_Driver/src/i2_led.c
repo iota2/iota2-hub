@@ -42,21 +42,21 @@ void i2_led_init(void)
   i2_gpio_init();
 
   for ( i = 0; i < MAX_NUM_LEDS; i++ ) {
-    i2_gpio_config_out(&led[i], false);
+    i2_gpio_config_out(&led[i], I2_LOW);
   }
 }
 
 void i2_led_on(i2_led_t led_idx)
 {
   if ( MAX_NUM_LEDS > led_idx ) {
-    i2_gpio_config_out(&led[led_idx], true);
+    i2_gpio_config_out(&led[led_idx], I2_HIGH);
   }
 }
 
 void i2_led_off(i2_led_t led_idx)
 {
   if ( MAX_NUM_LEDS > led_idx ) {
-    i2_gpio_config_out(&led[led_idx], false);
+    i2_gpio_config_out(&led[led_idx], I2_LOW);
   }
 }
 

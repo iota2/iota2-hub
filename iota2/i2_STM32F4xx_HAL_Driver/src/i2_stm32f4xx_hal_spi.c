@@ -27,7 +27,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "i2_stm32f4xx_hal_spi.h"
 
-
 #if defined ( ENABLE_RTOS_AWARE_HAL )
 #include <FreeRTOS.h>
 #include <semphr.h>
@@ -302,7 +301,7 @@ i2_error i2_spi_init(i2_spi_inst_t *inst)
 
   /* Configure CS */
   if (i2_gpio_is_valid(&inst->CS)) {
-    i2_gpio_config_out(&inst->CS, true);
+    i2_gpio_config_out(&inst->CS, I2_HIGH);
   }
 
   /*
@@ -746,14 +745,14 @@ i2_error i2_spi_txrx( i2_spi_inst_t *inst, i2_spi_data_width_t data_width,
 
   /* assert CS */
   if ( i2_gpio_is_valid(&inst->CS) ) {
-    i2_gpio_set(&inst->CS, false);
+    i2_gpio_set(&inst->CS, I2_LOW);
   }
 
   err = i2_spi_txrx_raw(inst, data_width, clk_speed, spi_mode,
                         first_bit, txbuf, rxbuf, size, timeout);
 
   /* deassert CS */
-  i2_gpio_set(&inst->CS, true);
+  i2_gpio_set(&inst->CS, I2_HIGH);
 
 #if defined ( ENABLE_RTOS_AWARE_HAL )
   xSemaphoreGive(ctx->mutex);
@@ -819,7 +818,7 @@ i2_error i2_spi_cs_assert(i2_spi_inst_t *inst, uint32_t timeout)
 
   /* assert CS */
   if ( i2_gpio_is_valid(&inst->CS) ) {
-    i2_gpio_set(&inst->CS, false);
+    i2_gpio_set(&inst->CS, I2_LOW);
   }
 
   return I2_SUCCESS;
@@ -840,7 +839,7 @@ i2_error i2_spi_cs_deassert(i2_spi_inst_t *inst)
 
   /* deassert CS */
   if ( i2_gpio_is_valid(&inst->CS) ) {
-    i2_gpio_set(&inst->CS, true);
+    i2_gpio_set(&inst->CS, I2_HIGH);
   }
 
 #if defined ( ENABLE_RTOS_AWARE_HAL )

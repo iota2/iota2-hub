@@ -46,6 +46,10 @@
 #include "i2_fifo.h"
 #include "i2_led.h"
 
+/* HMI Interface -------------------------------------------------------------*/
+#include "i2_font5x7.h"
+#include "i2_oled_ssd1306.h"
+
 /*
  * This is the IOTA2-HUB SW version in format MAJOR.MINOR.HOTFIX
  * Note that Hotfix is 16 bit and Minor and Major is 8 bit.

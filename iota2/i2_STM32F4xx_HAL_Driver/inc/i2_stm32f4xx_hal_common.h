@@ -59,6 +59,10 @@ typedef struct {
 #define I2_DISABLE                        ( 0 )
 #define I2_ENABLE                         ( 1 )
 
+/* Definitions For Pin HIGH / LOW Functionalities */
+#define I2_LOW                            ( 0 )
+#define I2_HIGH                           ( 1 )
+
 /* Public functions ----------------------------------------------------------*/
 i2_error i2_get_hal_error(HAL_StatusTypeDef err);
 void i2_delay_tick(uint32_t tick);

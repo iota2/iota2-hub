@@ -88,6 +88,7 @@ int main(void)
   i2_led_init();
   i2_uart_init( &uart_console );
   i2_spi_init( &ext_flash );
+  ssd1306_init(SSD1306_CMD_SWITCH_CAP_VCC);
 
   /* Create user task */
   HUB_statusHandle = xTaskCreate( HUB_taskUSER, "HUB",  HUB_taskStckDepthUSER,

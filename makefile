@@ -135,6 +135,9 @@ SRCS       += iota2/i2_STM32F4xx_HAL_Driver/i2_stm32f4xx_hal_uart.c
 SRCS       += iota2/i2_STM32F4xx_HAL_Driver/i2_stm32f4xx_hal_spi.c
 SRCS       += iota2/i2_Interface_Driver/src/i2_fifo.c
 SRCS       += iota2/i2_Interface_Driver/src/i2_led.c
+SRCS       += iota2/i2_Interface_Driver/src/i2_font5x7.c
+SRCS       += iota2/i2_Interface_Driver/src/i2_oled_ssd1306.c
+
 
 ASMS_TEMP  := $(notdir $(ASMS))
 SRCS_TEMP  := $(notdir $(SRCS))
