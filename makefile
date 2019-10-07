@@ -101,10 +101,11 @@ INCLUDES    = $(LIBINC)
 CFLAGS     += $(CPU) $(STM32_OPT) $(OTHER_OPT)
 CFLAGS     += -Wall -fno-common -fno-short-enums
 CFLAGS     += $(INCLUDES) -Wfatal-errors -std=gnu99 -DGIT_VERSION=\"$(GIT_HASH)\"
-CFLAGS     += -Werror
+CFLAGS     += -Werror -coverage
 
 ASFLAGS     = $(CFLAGS) -x assembler-with-cpp
-LDFLAGS     = -Wl,--gc-sections,-Map=$*.map,-cref -fno-short-enums -Wl,--no-enum-size-warning -T $(LDSCRIPT) $(CPU)
+LDFLAGS     = -Wl,--gc-sections,-Map=$*.map,-cref -fno-short-enums # -Wl,--no-enum-size-warning -T $(LDSCRIPT) $(CPU) -coverage
+LDFLAGS    += -Wl,--no-enum-size-warning -T $(LDSCRIPT) $(CPU) -coverage
 ARFLAGS     = cr
 OBJFLAGS_C  = -Obinary
 OBJFLAGS_D  = -S
