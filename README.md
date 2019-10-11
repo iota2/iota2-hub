@@ -6,6 +6,7 @@
 
 [![BSD licensed](https://img.shields.io/badge/license-GPL3-blue.svg)](https://raw.githubusercontent.com/iota2/iota2-hub/develop/LICENSE)
 [![Build Status](https://travis-ci.org/iota2/iota2-hub.svg?branch=develop)](https://travis-ci.org/iota2/iota2-hub)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub?ref=badge_shield)
 
 ## IOTA2-HUB
 IOTA2-HUB is an Ethernet connectivity module that is able to 
@@ -33,3 +34,6 @@ connect over a number of internet protocols
 
 **Free Software, Hell Yeah!**
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub?ref=badge_large)
