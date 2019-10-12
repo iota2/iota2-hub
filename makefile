@@ -57,6 +57,7 @@ export AS      := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gcc
 export OBJCOPY := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)objcopy
 export OBJDUMP := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)objdump
 export GDB     := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gdb
+export GCOV    := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gcov
 export SIZE    := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)size
 
 OUTPUT_ROOT = build
@@ -70,9 +71,9 @@ endif
 ELF         = $(OUTPUT)/$(NAME).elf
 BIN         = $(OUTPUT)/$(NAME).bin
 HEX         = $(OUTPUT)/$(NAME).hex
-OUT         = $(OUTPUT)/$(NAME).out
 LST         = $(OUTPUT)/$(NAME).list
 MAP         = $(OUTPUT)/$(NAME).map
+COV         = $(OUTPUT)/GCOV/
 
 GIT_HASH   := $(shell git describe --dirty --always --abbrev=0)
 
@@ -99,12 +100,12 @@ LIBS       += ./$(MDL_DIR)/FreeRTOSv10.2.1/FreeRTOS/lib_freertos_v10_2_1.a
 
 INCLUDES    = $(LIBINC)
 CFLAGS     += $(CPU) $(STM32_OPT) $(OTHER_OPT)
-CFLAGS     += -Wall -fno-common -fno-short-enums
-CFLAGS     += $(INCLUDES) -Wfatal-errors -std=gnu99 -DGIT_VERSION=\"$(GIT_HASH)\"
-CFLAGS     += -Werror -coverage
+CFLAGS     += -fno-common -fno-short-enums
+CFLAGS     += $(INCLUDES) -std=gnu99 -DGIT_VERSION=\"$(GIT_HASH)\"
+CFLAGS     += -Wall -Werror -Wfatal-errors
 
 ASFLAGS     = $(CFLAGS) -x assembler-with-cpp
-LDFLAGS     = -Wl,--gc-sections,-Map=$*.map,-cref -fno-short-enums # -Wl,--no-enum-size-warning -T $(LDSCRIPT) $(CPU) -coverage
+LDFLAGS     = -Wl,--gc-sections,-Map=$(MAP),-cref -fno-short-enums
 LDFLAGS    += -Wl,--no-enum-size-warning -T $(LDSCRIPT) $(CPU) -coverage
 ARFLAGS     = cr
 OBJFLAGS_C  = -Obinary
@@ -122,6 +123,18 @@ CFLAGS 	   += -ggdb -g3 -Og
 LDFLAGS    += --specs=rdimon.specs -Og
 endif
 
+# -------------------------------------------------------------
+# Code Coverage Computation
+#   Adding -coverage to both CFLAGS and LDFLAGS
+#   - This will enable both -fprofile-arcs and -ftest-coverage flags
+# -------------------------------------------------------------
+ifeq ($(CODE_COV), yes)
+CFLAGS     += -coverage
+LDFLAGS    += -coverage
+GCOV_PREFIX = $(COV)
+GCOV_PREFIX_STRIP = 1
+endif
+
 export CFLAGS
 export ARFLAGS
 
@@ -130,7 +143,6 @@ VPATH      += iota2/i2_Interface_Driver/src:
 VPATH      += iota2/i2_STM32F4xx_HAL_Driver/src:
 VPATH      += $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates:
 VPATH      += $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc:
-VPATH      += $(MDL_DIR)/iota2/i2_Interface_Driver/src:
 
 ASMS        = $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f407xx.s
 
@@ -160,7 +172,7 @@ DEPS        = $(AOBJS:.o=.d)
 DEPS       += $(OBJS:.o=.d)
 
 all: $(OUTPUT) $(ELF) $(BIN) $(HEX)
-	$(OBJDUMP) $(OBJFLAGS_D) $(OUT) > $(LST)
+	$(OBJDUMP) $(OBJFLAGS_D) $(ELF) > $(LST)
 	$(SIZE) $(ELF)
 	@echo "\n"
 	$(MAP_FILE_PARSER) -w $(MAP)
@@ -175,19 +187,11 @@ erase:
 	@echo "Erasing Target..."
 	st-flash erase
 
-test: $(AOBJS) $(OBJS)
-	@echo ----- ASM -----
-	@echo $(ASMS)
-	@echo ----- SRC -----
-	@echo $(SRCS)
-	@echo ---- AOBJ -----
-	@echo $(AOBJS)
-	@echo ----- OBJ -----
-	@echo $(OBJS)
-	@echo ----- DEP -----
-	@echo $(DEPS)
+$(OUTPUT):
+	mkdir -p $(OUTPUT)
+	mkdir -p $(COV)
 
-$(ELF): $(OUT) $(LIBS) $(AOBJS) $(OBJS)
+$(ELF): $(LIBS) $(AOBJS) $(OBJS)
 	$(CC) $(AOBJS) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
 
 $(HEX): $(ELF)
@@ -195,9 +199,6 @@ $(HEX): $(ELF)
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary -S $< $@
-
-$(OUT): $(LIBS) $(AOBJS) $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $(AOBJS) $(OBJS) $(LIBS)
 
 $(LIBS): libs
 
@@ -224,9 +225,6 @@ clean:
 	@$(MAKE) -C $(DRV_DIR) clean
 	@$(MAKE) -C $(MDL_DIR) clean
 	
-$(OUTPUT):
-	mkdir -p $(OUTPUT)
-
 $(OUTPUT_ROOT)/%.o: %.c
 ifeq ($(VERBOSE_LEVEL),1)
 	@echo cc $<
@@ -239,6 +237,24 @@ ifeq ($(VERBOSE_LEVEL),1)
 endif
 	@$(AS) $(ASFLAGS) -c -o $@ $<
 
+get_code_cov:
+	@echo "#################################"
+	@echo "#   Computing code coverage...   "
+	@echo "#################################"
+	$(GCOV) -k -c -d **/*.gcno
+
+test: $(AOBJS) $(OBJS)
+	@echo ----- ASM -----
+	@echo $(ASMS)
+	@echo ----- SRC -----
+	@echo $(SRCS)
+	@echo ---- AOBJ -----
+	@echo $(AOBJS)
+	@echo ----- OBJ -----
+	@echo $(OBJS)
+	@echo ----- DEP -----
+	@echo $(DEPS)
+
 gcc_path:
 	@echo "Set paths for toolchain:"
 	@echo "\tCC:      $(CC)"
@@ -249,6 +265,7 @@ gcc_path:
 	@echo "\tOBJCOPY: $(OBJCOPY)"
 	@echo "\tOBJDUMP: $(OBJDUMP)"
 	@echo "\tGDB:     $(GDB)"
+	@echo "\tGCOV:    $(GCOV)"
 	@echo "\tSIZE:    $(SIZE)"
 
 help:
@@ -263,6 +280,7 @@ help:
 	@echo "[gcc_path]      Display all configured GCC paths"	
 	@echo "[flash]         Flash build to target"
 	@echo "[erase]         Erase target"
+	@echo "[get_code_cov]  Compute code coverage reports"
 	@echo "\nMake Configurations:"
 	@echo "[VERBOSE_LEVEL]"
 	@echo "   Define the make verbose level to print debug messages"
@@ -271,6 +289,8 @@ help:
 	@echo "     2 : All debug messages of make will be printed"
 	@echo "[RELEASE]"
 	@echo "   yes : Make Release build, else Debug build will be made"
+	@echo "[CODE_COV]"
+	@echo "   yes : Compile with code coverage flags"
 
 # *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
 

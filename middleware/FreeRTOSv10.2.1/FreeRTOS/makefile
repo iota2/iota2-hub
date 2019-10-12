@@ -42,6 +42,9 @@ SRCS += ./Source/timers.c
 
 LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS))) 
 
+GCOV_GCNO = $(sort $(patsubst %.c,%.gcno,$(SRCS)))
+GCOV_GCOV = $(sort $(patsubst %.c,%.gcov,$(SRCS)))
+
 .PHONY: all
 all: $(LIB_OUT)
 	@echo Build library $(LIB_OUT)
@@ -51,7 +54,7 @@ $(LIB_OUT): $(LIB_OBJS)
 
 .PHONY: clean
 clean:
-	-rm -f $(LIB_OBJS) $(LIB_OUT)
+	-rm -f $(LIB_OBJS) $(LIB_OUT) $(GCOV_GCNO) $(GCOV_GCOV)
 
 # *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
 
