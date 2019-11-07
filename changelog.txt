@@ -1,14 +1,19 @@
 #
-# @author       iota square <i2>
-# @date         07-09-2019
-#  _       _        ___  
-# (_)     | |      |__ \.
-#  _  ___ | |_ __ _   ) |
-# | |/ _ \| __/ _` | / / 
-# | | (_) | || (_| |/ /_ 
-# |_|\___/ \__\__,_|____|
+# @author       iota square [i2]
+# <pre>
+# ██╗ ██████╗ ████████╗ █████╗ ██████╗
+# ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+# ██║██║   ██║   ██║   ███████║ █████╔╝
+# ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+# ██║╚██████╔╝   ██║   ██║  ██║███████╗
+# ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+# </pre>
 #
-# @License      GNU GPU v3
+# @date         07-09-2019
+# @file         changelog.txt
+# @brief       	IOTA2 HUB changelog.
+#
+# @copyright    GNU GPU v3
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -36,5 +41,25 @@
 [ 16-09-2019 ]
     [HUB-13][SETUP] Integrate STM32F4XX_HAL library to HUB
 
-# *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
+[ 06-10-2019 ]
+    [HUB-11][DRIVER] Added Middleware interface support for
+                     STM32_peripheral_Interface_drivers (#3)
+    [HUB15][SET-UP] Travis-CI Integration (#4)
 
+[ 30-09-2019 ]
+    [HUB-18][HMI] Integrate SSD1306 display (#5)
+
+[ 06-10-2019 ]
+    [HUB-18][HMI] Integrate SSD1306 display (#5)
+    [HUB-21][SETUP] Utility tools integration (#6)
+
+[ 07-10-2019 ]
+    [HUB-23][CICD] Enable code overage (#7)
+
+[ 11-10-2019 ]
+    [HUB-27][LICENSE] Add license scan report and status (#8)
+
+[ 12-10-2019 ]
+    [HUB-24][GCOV] Enable build options for GCOV (#9)
+
+# *********************** (C) COPYRIGHT iota2 ***[i2]******END OF FILE**********

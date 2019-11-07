@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_error.h
+ * @brief       iota2 generic error codes.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,19 +36,26 @@
 #include <stdbool.h>
 
 /* Exported define -----------------------------------------------------------*/
-#define I2_SUCCESS                  ( 0 )
-#define I2_FAILURE                  ( 1 )
-#define I2_TIMEOUT                  ( 2 )
-#define I2_BUSY                     ( 3 )
-#define I2_INVALID_PARAM            ( 4 )
-#define I2_NOT_AVAILABLE            ( 5 )
-#define I2_NOT_IMPLEMENTED          ( 6 )
-#define I2_NOT_SUPPORTED            ( 7 )
-#define I2_READY_TO_SEND            ( 8 )
-#define I2_DATA_IS_CURRENT          ( 9 )
-#define I2_SSL_CON_CLOSED           ( 10 )
+/**
+ * @defgroup I2_ERROR iota2 unified Error Codes.
+ * Error codes to be used for uniform API maintenance.
+ *
+ * @{
+ */
+#define I2_SUCCESS              ( 0 )   /**< Successful executions            */
+#define I2_FAILURE              ( 1 )   /**< Generic failures                 */
+#define I2_TIMEOUT              ( 2 )   /**< Timeout occurred                 */
+#define I2_BUSY                 ( 3 )   /**< System busy in other executions  */
+#define I2_INVALID_PARAM        ( 4 )   /**< Invalid input parameters         */
+#define I2_NOT_AVAILABLE        ( 5 )   /**< Feature or option not available  */
+#define I2_NOT_IMPLEMENTED      ( 6 )   /**< Feature not implemented yet      */
+#define I2_NOT_SUPPORTED        ( 7 )   /**< Feature not supported            */
+#define I2_READY_TO_SEND        ( 8 )   /**< Module is ready to send data     */
+#define I2_DATA_IS_CURRENT      ( 9 )   /**< Received data not processed yet  */
+#define I2_SSL_CON_CLOSED       ( 10 )  /**< Connection Closed                */
+/** @} */ /* I2_ERROR */
 
 /* Exported constants --------------------------------------------------------*/
-typedef int32_t i2_error;
+typedef int32_t i2_error;   /**< Generic error code to use among i2 projects  */
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

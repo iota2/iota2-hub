@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        30-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        30-09-2019
+ * @file        i2_font5x7.h
+ * @brief       Generic 5x7 font.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,14 +33,19 @@
 
 /* Public Definitions --------------------------------------------------------*/
 
-/* Font Indexing for user defined characters */
-#define FONT5x7_ARROW_RIGHT             ( '>' )
-#define FONT5x7_ARROW_UP_DOWN           ( 255 )
-#define FONT5x7_ALARM_BELL              ( 256 )
-#define FONT5x7_HEART_SMALL             ( 257 )
-#define FONT5x7_HEART_LARGE             ( 258 )
+/**
+ * @defgroup i2_font5x7_custom_char Font indexing for user defined characters.
+ * Indexing for custom characters in 5x7 Font list.
+ *
+ * @{
+ */
+#define FONT5x7_ARROW_RIGHT       ( '>' ) /**< Index of right arrow bitmap    */
+#define FONT5x7_ARROW_UP_DOWN     ( 255 ) /**< Index of up down arrow bitmap  */
+#define FONT5x7_ALARM_BELL        ( 256 ) /**< Index of bell bitmap           */
+#define FONT5x7_HEART_SMALL       ( 257 ) /**< Index of small heart bitmap    */
+#define FONT5x7_HEART_LARGE       ( 258 ) /**< Index of large heart bitmap    */
+/** @} */ /* i2_font5x7_custom_char */
 
-/* Character set 8514oem */
-extern const unsigned char i2_font5x7[];
+extern const unsigned char i2_font5x7[];  /**< 8514oem 5x7 character set      */
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

@@ -122,9 +122,9 @@
                is no need to call the 2 first functions listed above, since SystemCoreClock
                variable is updated automatically.
   */
-uint32_t SystemCoreClock = 16000000;
-const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
-const uint8_t APBPrescTable[8]  = {0, 0, 0, 0, 1, 2, 3, 4};
+uint32_t SystemCoreClock = 16000000;  /*!< System Core Clock */
+const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9}; /*!< AHB prescaler reference table */
+const uint8_t APBPrescTable[8]  = {0, 0, 0, 0, 1, 2, 3, 4};                         /*!< APB prescaler reference table */
 /**
   * @}
   */
@@ -149,7 +149,6 @@ const uint8_t APBPrescTable[8]  = {0, 0, 0, 0, 1, 2, 3, 4};
   * @brief  Setup the microcontroller system
   *         Initialize the FPU setting, vector table location and External memory
   *         configuration.
-  * @param  None
   * @retval None
   */
 void SystemInit(void)
@@ -222,7 +221,6 @@ void SystemInit(void)
   *         - The result of this function could be not correct when using fractional
   *           value for HSE crystal.
   *
-  * @param  None
   * @retval None
   */
 void SystemCoreClockUpdate(void)
@@ -279,7 +277,6 @@ void SystemCoreClockUpdate(void)
   *         Called in startup_stm32f4xx.s before jump to main.
   *         This function configures the external memories (SRAM/SDRAM)
   *         This SRAM/SDRAM will be used as program data memory (including heap and stack).
-  * @param  None
   * @retval None
   */
 void SystemInit_ExtMemCtl(void)

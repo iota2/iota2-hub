@@ -1,15 +1,19 @@
 #
-# @author       iota square <i2>
+# @author       iota square [i2]
+# <pre>
+# ██╗ ██████╗ ████████╗ █████╗ ██████╗
+# ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+# ██║██║   ██║   ██║   ███████║ █████╔╝
+# ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+# ██║╚██████╔╝   ██║   ██║  ██║███████╗
+# ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+# </pre>
+#
 # @date         30-09-2019
 # @file         .travis.yml
-#  _       _        ___  
-# (_)     | |      |__ \.
-#  _  ___ | |_ __ _   ) |
-# | |/ _ \| __/ _` | / / 
-# | | (_) | || (_| |/ /_ 
-# |_|\___/ \__\__,_|____|
+# @brief       	Travis CI-CD configuration.
 #
-# @License      GNU GPU v3
+# @copyright    GNU GPU v3
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -39,5 +43,4 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-# *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
-
+# *********************** (C) COPYRIGHT iota2 ***[i2]******END OF FILE**********

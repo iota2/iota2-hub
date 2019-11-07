@@ -1,14 +1,19 @@
 #
-# @author       iota square <i2>
-# @date         14-09-2019
-#  _       _        ___  
-# (_)     | |      |__ \.
-#  _  ___ | |_ __ _   ) |
-# | |/ _ \| __/ _` | / / 
-# | | (_) | || (_| |/ /_ 
-# |_|\___/ \__\__,_|____|
+# @author       iota square [i2]
+# <pre>
+# ██╗ ██████╗ ████████╗ █████╗ ██████╗
+# ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+# ██║██║   ██║   ██║   ███████║ █████╔╝
+# ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+# ██║╚██████╔╝   ██║   ██║  ██║███████╗
+# ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+# </pre>
 #
-# @License      GNU GPU v3
+# @date         14-09-2019
+# @file         middleware/FreeRTOSv10.2.1/FreeRTOS/makefile
+# @brief       	Makefile for FreeRTOS.
+#
+# @copyright    GNU GPU v3
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,7 +29,7 @@
 #
 
 ifeq ($(VERBOSE_LEVEL),2)
-# All make debug messages will be printed 
+# All make debug messages will be printed
 else
 .SILENT:
 endif
@@ -38,9 +43,9 @@ SRCS += ./Source/list.c
 SRCS += ./Source/queue.c
 SRCS += ./Source/stream_buffer.c
 SRCS += ./Source/tasks.c
-SRCS += ./Source/timers.c 
+SRCS += ./Source/timers.c
 
-LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS))) 
+LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS)))
 
 GCOV_GCNO = $(sort $(patsubst %.c,%.gcno,$(SRCS)))
 GCOV_GCOV = $(sort $(patsubst %.c,%.gcov,$(SRCS)))
@@ -56,5 +61,4 @@ $(LIB_OUT): $(LIB_OBJS)
 clean:
 	-rm -f $(LIB_OBJS) $(LIB_OUT) $(GCOV_GCNO) $(GCOV_GCOV)
 
-# *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
-
+# *********************** (C) COPYRIGHT iota2 ***[i2]******END OF FILE**********

@@ -1,16 +1,20 @@
 #!/usr/bin/perl
 #
-# @author       iota square <i2>
-# @date         07-09-2019
-# @file         map_parser.pl
-#  _       _        ___  
-# (_)     | |      |__ \.
-#  _  ___ | |_ __ _   ) |
-# | |/ _ \| __/ _` | / / 
-# | | (_) | || (_| |/ /_ 
-# |_|\___/ \__\__,_|____|
+# @author       iota square [i2]
+# <pre>
+# ██╗ ██████╗ ████████╗ █████╗ ██████╗
+# ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+# ██║██║   ██║   ██║   ███████║ █████╔╝
+# ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+# ██║╚██████╔╝   ██║   ██║  ██║███████╗
+# ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+# </pre>
 #
-# @License      GNU GPU v3
+# @file         map_parser.pl
+# @date         12-10-2019
+# @brief       	Utility to parse map file into different segments.
+#
+# @copyright    GNU GPU v3
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -379,5 +383,4 @@ sub print_module_total( )
   print "\n"
 }
 
-# *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
-
+# *********************** (C) COPYRIGHT iota2 ***[i2]******END OF FILE**********

@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_assert.h
+ * @brief       System assert functionality.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,13 +35,22 @@
 #include <stdint.h>
 
 /* Exported define -----------------------------------------------------------*/
+/**
+ * @defgroup I2_ASSERT Assert definition.
+ * Call for assert function.
+ *
+ * @{
+ */
 #if defined(ENABLE_ASSERT)
+/** @brief Assert Definition when enabled */
 #define ASSERT(x) do { if (!(x)) assert(0); } while (0)
 #else
-#define ASSERT(x)
+/** @brief Assert Definition when disabled */
+#define ASSERT(x) do { ; } while (0);
 #endif
+/** @} */ /* I2_ASSERT */
 
 /* Exported functions ------------------------------------------------------- */
 void i2_assert(int32_t good);
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

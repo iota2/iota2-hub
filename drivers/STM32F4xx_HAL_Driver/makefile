@@ -1,14 +1,19 @@
 #
-# @author       iota square <i2>
-# @date         16-09-2019
-#  _       _        ___  
-# (_)     | |      |__ \.
-#  _  ___ | |_ __ _   ) |
-# | |/ _ \| __/ _` | / / 
-# | | (_) | || (_| |/ /_ 
-# |_|\___/ \__\__,_|____|
+# @author       iota square [i2]
+# <pre>
+# ██╗ ██████╗ ████████╗ █████╗ ██████╗
+# ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+# ██║██║   ██║   ██║   ███████║ █████╔╝
+# ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+# ██║╚██████╔╝   ██║   ██║  ██║███████╗
+# ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+# </pre>
 #
-# @License      GNU GPU v3
+# @date         16-09-2019
+# @file         drivers/STM32F4xx_HAL_Driver/makefile
+# @brief       	Makefile for STM32F4xx HAL drivers.
+#
+# @copyright    GNU GPU v3
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,7 +29,7 @@
 #
 
 ifeq ($(VERBOSE_LEVEL),2)
-# All make debug messages will be printed 
+# All make debug messages will be printed
 else
 .SILENT:
 endif
@@ -40,6 +45,7 @@ SRCS += ./Src/stm32f4xx_hal_dma.c
 SRCS += ./Src/stm32f4xx_hal_eth.c
 SRCS += ./Src/stm32f4xx_hal_exti.c
 SRCS += ./Src/stm32f4xx_hal_flash.c
+SRCS += ./Src/stm32f4xx_hal_flash_ex.c
 SRCS += ./Src/stm32f4xx_hal_gpio.c
 SRCS += ./Src/stm32f4xx_hal_hash.c
 SRCS += ./Src/stm32f4xx_hal_i2c.c
@@ -57,7 +63,7 @@ SRCS += ./Src/stm32f4xx_hal_uart.c
 SRCS += ./Src/stm32f4xx_hal_usart.c
 SRCS += ./Src/stm32f4xx_hal_wwdg.c
 
-LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS))) 
+LIB_OBJS = $(sort $(patsubst %.c,%.o,$(SRCS)))
 
 GCOV_GCNO = $(sort $(patsubst %.c,%.gcno,$(SRCS)))
 GCOV_GCOV = $(sort $(patsubst %.c,%.gcov,$(SRCS)))
@@ -73,5 +79,4 @@ $(LIB_OUT): $(LIB_OBJS)
 clean:
 	-rm -f $(LIB_OBJS) $(LIB_OUT) $(GCOV_GCNO) $(GCOV_GCOV)
 
-# *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
-
+# *********************** (C) COPYRIGHT iota2 ***[i2]******END OF FILE**********

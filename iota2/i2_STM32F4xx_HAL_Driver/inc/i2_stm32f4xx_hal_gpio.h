@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_stm32f4xx_hal_gpio.h
+ * @brief       GPIO set-up and control.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,16 +35,24 @@
 #include <i2_stm32f4xx_hal_common.h>
 
 /* Public definitions --------------------------------------------------------*/
+/**
+ * @defgroup i2_gpio_inst_t GPIO interface instance.
+ * Instance defining all parameters for GPIO interfacing.
+ *
+ * @{
+ */
+/** @brief GPIO instance */
 typedef struct {
-  const char    *name;
-  GPIO_TypeDef  *gpio_port;
-  uint32_t      gpio;
-  uint32_t      speed;
-  uint32_t      pull;
-  uint32_t      mode;
-  uint32_t      alt;
-  bool          active;
-} i2_gpio_inst_t;
+  const char    *name;        /**< Pin identification name    */
+  GPIO_TypeDef  *gpio_port;   /**< GPIO port to configure     */
+  uint32_t      gpio;         /**< GPIO pin to configure      */
+  uint32_t      speed;        /**< GPIO pin speed             */
+  uint32_t      pull;         /**< Push / Pull configuration  */
+  uint32_t      mode;         /**< GPIO operation mode        */
+  uint32_t      alt;          /**< Alternate function mapping */
+  bool          active;       /**< Pin activation check       */
+} i2_gpio_inst_t;             /**< GPIO instance              */
+/** @} */ /* i2_gpio_inst_t */
 
 /* Public functions --------------------------------------------------------- */
 void i2_gpio_init(void);
@@ -58,4 +71,4 @@ i2_error i2_gpio_config_interrupt(i2_gpio_inst_t *inst, uint32_t mode,
                                   uint32_t pull,
                                   void (*cb)(void *arg), void *arg);
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

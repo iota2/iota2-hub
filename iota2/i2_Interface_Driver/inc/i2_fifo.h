@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_fifo.h
+ * @brief       FIFO buffer implementation.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,13 +36,20 @@
 #include <stdbool.h>
 
 /* Public define -------------------------------------------------------------*/
+/**
+ * @defgroup i2_fifo_t FIFO context.
+ * Definitions for FIFO context.
+ *
+ * @{
+ */
+/** @brief FIFO implementation context */
 typedef struct {
-  int32_t wr_index;
-  int32_t rd_index;
-  int32_t fifo_size;
-  int32_t count;
-  uint8_t *buf;
+  int32_t wr_index;     /**< FIFO write index       */
+  int32_t rd_index;     /**< FIFO read index        */
+  int32_t fifo_size;    /**< Size of FIFO buffer    */
+  uint8_t *buf;         /**< FIFO buffer            */
 } i2_fifo_t ;
+/** @} */ /* i2_fifo_t */
 
 /* Public functions --------------------------------------------------------- */
 void i2_fifo_init(i2_fifo_t *fifo, uint8_t *buf, int32_t fifo_size);
@@ -48,4 +60,4 @@ int32_t i2_fifo_write(i2_fifo_t *fifo, uint8_t data, bool in_isr);
 int32_t i2_fifo_read(i2_fifo_t *fifo, uint8_t *data, bool in_isr);
 void i2_fifo_copy(i2_fifo_t *fifo, uint8_t *dst, int32_t *size, bool in_isr);
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

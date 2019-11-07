@@ -1,11 +1,11 @@
 /**
   ******************************************************************************
-  * @file    GPIO/GPIO_IOToggle/stm32f4xx_it.c 
+  * @file    stm32f4xx_it.c
   * @author  MCD Application Team
   * @version V1.8.0
   * @date    04-November-2016
   * @brief   Main Interrupt Service Routines.
-  *          This file provides template for all exceptions handler and 
+  *          This file provides template for all exceptions handler and
   *          peripherals interrupt service routine.
   ******************************************************************************
   * @attention
@@ -18,8 +18,8 @@
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
@@ -51,7 +51,6 @@
 
 /**
   * @brief   This function handles NMI exception.
-  * @param  None
   * @retval None
   */
 void NMI_Handler(void)
@@ -60,7 +59,6 @@ void NMI_Handler(void)
 
 /**
   * @brief  This function handles Hard Fault exception.
-  * @param  None
   * @retval None
   */
 void HardFault_Handler(void)
@@ -73,7 +71,6 @@ void HardFault_Handler(void)
 
 /**
   * @brief  This function handles Memory Manage exception.
-  * @param  None
   * @retval None
   */
 void MemManage_Handler(void)
@@ -86,7 +83,6 @@ void MemManage_Handler(void)
 
 /**
   * @brief  This function handles Bus Fault exception.
-  * @param  None
   * @retval None
   */
 void BusFault_Handler(void)
@@ -99,7 +95,6 @@ void BusFault_Handler(void)
 
 /**
   * @brief  This function handles Usage Fault exception.
-  * @param  None
   * @retval None
   */
 void UsageFault_Handler(void)
@@ -112,7 +107,6 @@ void UsageFault_Handler(void)
 
 /**
   * @brief  This function handles SVCall exception.
-  * @param  None
   * @retval None
   */
 __weak void SVC_Handler(void)
@@ -121,7 +115,6 @@ __weak void SVC_Handler(void)
 
 /**
   * @brief  This function handles Debug Monitor exception.
-  * @param  None
   * @retval None
   */
 void DebugMon_Handler(void)
@@ -130,7 +123,6 @@ void DebugMon_Handler(void)
 
 /**
   * @brief  This function handles PendSVC exception.
-  * @param  None
   * @retval None
   */
 __weak void PendSV_Handler(void)
@@ -139,7 +131,6 @@ __weak void PendSV_Handler(void)
 
 /**
   * @brief  This function handles SysTick Handler.
-  * @param  None
   * @retval None
   */
 __weak void SysTick_Handler(void)
@@ -153,22 +144,23 @@ __weak void SysTick_Handler(void)
 /*  file (startup_stm32f40xx.s/startup_stm32f427x.s/startup_stm32f429x.s).    */
 /******************************************************************************/
 
+#if 0
 /**
   * @brief  This function handles PPP interrupt request.
-  * @param  None
   * @retval None
   */
-/*void PPP_IRQHandler(void)
+void PPP_IRQHandler(void)
 {
-}*/
+}
+#endif
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

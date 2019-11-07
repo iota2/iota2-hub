@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        07-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        07-09-2019
+ * @file        main.h
+ * @brief       iota2 HUB application.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -50,17 +55,21 @@
 #include "i2_font5x7.h"
 #include "i2_oled_ssd1306.h"
 
-/*
+/**
+ * @defgroup I2_HUB_VERSION iota2 Firmware version.
  * This is the IOTA2-HUB SW version in format MAJOR.MINOR.HOTFIX
  * Note that Hotfix is 16 bit and Minor and Major is 8 bit.
+ *
+ * @{
  */
-#define IOTA2_CONN_EMB_MAJOR_VERSION_NUMBER     ( 1 ) //a value between 0-255
-#define IOTA2_CONN_EMB_MINOR_VERSION_NUMBER     ( 0 ) //a value between 0-255
-#define IOTA2_CONN_EMB_HOTFIX_VERSION_NUMBER    ( 0 ) //a value between 0-65535
+#define IOTA2_HUB_MAJOR_VERSION     ( 1 )       /**< A value between 0-255    */
+#define IOTA2_HUB_MINOR_VERSION     ( 0 )       /**< A value between 0-255    */
+#define IOTA2_HUB_HOTFIX_VERSION    ( 0 )       /**< A value between 0-65535  */
+/** @} */ /* I2_HUB_VERSION */
 
 /* Exported define -----------------------------------------------------------*/
-#define HUB_taskPritorityUSER                   configMIN_PRIORITIES
-#define HUB_taskStckDepthUSER                   ( 10 )
+#define HUB_taskPritorityUSER   configMIN_PRIORITIES  /**< Task Min Priority  */
+#define HUB_taskStckDepthUSER   ( 10 )                /**< Generic Task Depth */
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -69,5 +78,4 @@
 
 #endif /* __MAIN_H */
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
-
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

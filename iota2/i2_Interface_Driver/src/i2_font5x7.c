@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        30-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        30-09-2019
+ * @file        i2_font5x7.c
+ * @brief       Generic 5x7 font.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,8 +30,13 @@
  **/
 
 /* Public Definitions --------------------------------------------------------*/
-/* Standard ASCII 5x7 font */
-/* Defined Character set is 8514oem */
+/**
+ * @defgroup i2_font5x7 iota2 standard ASCII 5x7 font.
+ * Defined Character set is 8514oem.
+ *
+ * @{
+ */
+/** @brief 8514oem 5x7 character set */
 const unsigned char i2_font5x7[] = {
   0x00, 0x00, 0x00, 0x00, 0x00,
   0x3E, 0x5B, 0x4F, 0x5B, 0x3E,
@@ -282,12 +292,15 @@ const unsigned char i2_font5x7[] = {
   0x00, 0x1F, 0x01, 0x01, 0x1E,
   0x00, 0x19, 0x1D, 0x17, 0x12,
   0x00, 0x3C, 0x3C, 0x3C, 0x3C,
-  0x00, 0x00, 0x00, 0x00, 0x00,    /* Character set 8514oem terminate here */
+  0x00, 0x00, 0x00, 0x00, 0x00,
+  /* Character set 8514oem terminate here */
 
-  0x24, 0x42, 0x81, 0x42, 0x24,    /* Up Down Arrow */
-  0x10, 0x1E, 0x3F, 0x1E, 0x10,    /* Alarm Bell Symbol */
-  0x0C, 0x1E, 0x3C, 0x1E, 0x0C,    /* Heart Symbol Small */
-  0x1E, 0x3E, 0xFC, 0x3E, 0x1E     /* Heart Symbol Large */
+  /* Custom character set starts here     */
+  0x24, 0x42, 0x81, 0x42, 0x24,    /* Up Down Arrow       */
+  0x10, 0x1E, 0x3F, 0x1E, 0x10,    /* Alarm Bell Symbol   */
+  0x0C, 0x1E, 0x3C, 0x1E, 0x0C,    /* Heart Symbol Small  */
+  0x1E, 0x3E, 0xFC, 0x3E, 0x1E     /* Heart Symbol Large  */
 };
+/** @} */ /* i2_font5x7 */
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

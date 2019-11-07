@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_led.c
+ * @brief       LED interface.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,12 +34,26 @@
 #include <i2_stm32f4xx_hal_gpio.h>
 
 /* Private variables ---------------------------------------------------------*/
+/**
+ * @defgroup I2_LED LED pin specification.
+ * LED mapping to GPIOs.
+ *
+ * @{
+ */
+/** @brief LED Pins configuration */
 static i2_gpio_inst_t led[MAX_NUM_LEDS] = {
-  { "LED1", GPIOI, GPIO_PIN_8 },
-  { "LED2", GPIOI, GPIO_PIN_9 },
+  { "LED1", GPIOI, GPIO_PIN_8 },              /**< LED1 pin configuration */
+  { "LED2", GPIOI, GPIO_PIN_9 },              /**< LED2 pin configuration */
 };
+/** @} */ /* I2_LED */
 
 /* Public functions ----------------------------------------------------------*/
+/**
+ * @brief   Initializes LED components.
+ * @details Initialize all LED defined under I2_LED specifications.
+ *
+ * @return  None.
+ */
 void i2_led_init(void)
 {
   int32_t i;
@@ -46,6 +65,13 @@ void i2_led_init(void)
   }
 }
 
+/**
+ * @brief   Turns LED on.
+ * @details Turns on specific LED.
+ *
+ * @param[in] led_idx     Index of LED to turn on @ref i2_led_t.
+ * @return  None.
+ */
 void i2_led_on(i2_led_t led_idx)
 {
   if ( MAX_NUM_LEDS > led_idx ) {
@@ -53,6 +79,13 @@ void i2_led_on(i2_led_t led_idx)
   }
 }
 
+/**
+ * @brief   Turns LED off.
+ * @details Turns off specific LED.
+ *
+ * @param[in] led_idx     Index of LED to turn off @ref i2_led_t.
+ * @return  None.
+ */
 void i2_led_off(i2_led_t led_idx)
 {
   if ( MAX_NUM_LEDS > led_idx ) {
@@ -60,6 +93,13 @@ void i2_led_off(i2_led_t led_idx)
   }
 }
 
+/**
+ * @brief   Toggles LED state.
+ * @details Toggles current state of LED.
+ *
+ * @param[in] led_idx    Index of LED to toggle @ref i2_led_t.
+ * @return  None.
+ */
 void i2_led_toggle(i2_led_t led_idx)
 {
   if ( MAX_NUM_LEDS > led_idx ) {
@@ -67,4 +107,4 @@ void i2_led_toggle(i2_led_t led_idx)
   }
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

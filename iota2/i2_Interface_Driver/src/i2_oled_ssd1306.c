@@ -1,15 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        30-09-2019
- * @file       	i2_oled_ssd1306.c
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @license     GNU GPU v3
+ * @date        30-09-2019
+ * @file        i2_oled_ssd1306.c
+ * @brief       OLED SSD1306 interface.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,142 +28,147 @@
  * Free Software, Hell Yeah!
  *
  **/
-
 /* Includes ------------------------------------------------------------------*/
 #include "i2_oled_ssd1306.h"
 #include "i2_font5x7.h"
 
 /**
- * SSD1306 Hardware Pins Definition.
+ * @defgroup SSD1306_HW_SPEC SSD1306 Hardware Pins Definition.
  * Pin configurations of SSD1306 LCD module.
  *
- * @defgroup SSD1306_HW_SPEC
+ * @{
  *
- *    +=========+===============+=========+=======+
- *    | PIN No. | SSD1306 PIN   | PIN ID  |  MCU  |
- *    +=========+===============+=========+=======+
- *    |    1    | GND           |  0 V    |  GND  |
- *    |    2    | VCC           |  3.3 V  |  VCC  |
- *    |    3    | CLOCK         |  C      |  SCK  |
- *    |    4    | DATA          |  D      |  MOSI |
- *    |    5    | RESET         |  ST     |  RST  |
- *    |    6    | DATA/CMD      |  D/C    |  CMD  |
- *    |    7    | CHIP SELECT   |  CS     |  NSS  |
- *    +=========+===============+=========+=======+
+ *    | PIN No. | SSD1306 PIN   | PIN ID    |  MCU  |
+ *    |---------|---------------|-----------|-------|
+ *    |    1    | GND           |  0 V      |  GND  |
+ *    |    2    | VCC           |  3.3 V    |  VCC  |
+ *    |    3    | CLOCK         |  C        |  SCK  |
+ *    |    4    | DATA          |  D        |  MOSI |
+ *    |    5    | RESET         |  ST       |  RST  |
+ *    |    6    | DATA/CMD      |  D/C      |  CMD  |
+ *    |    7    | CHIP SELECT   |  CS       |  NSS  |
  */
-#define SSD1306_PIN_CS            GPIOG, GPIO_PIN_14  /**> Chip Select Pin */
-#define SSD1306_PIN_DC            GPIOH, GPIO_PIN_2   /**> Data / CMD Pin */
-#define SSD1306_PIN_RST           GPIOC, GPIO_PIN_7   /**> Display Reset Pin */
+#define SSD1306_PIN_CS            GPIOG, GPIO_PIN_14  /**< Chip Select Pin    */
+#define SSD1306_PIN_DC            GPIOH, GPIO_PIN_2   /**< Data / CMD Pin     */
+#define SSD1306_PIN_RST           GPIOC, GPIO_PIN_7   /**< Display Reset Pin  */
+/** @} */ /* SSD1306_HW_SPEC */
 
 /**
- * SSD1306 SPI instance.
+ * @defgroup SSD1306_SPI_SPEC SSD1306 SPI instance.
  * SPI interface and Chip Select definition.
  *
- * @defgroup SSD1306_SPI_SPEC
+ * @{
  */
+/** @brief ssd1306 display control instance */
 static i2_spi_inst_t ssd1306 = {
   "ssd1306", "SPI1", { "ssd1306_CS", SSD1306_PIN_CS }
 };
+/** @} */ /* SSD1306_SPI_SPEC */
 
 /**
- * GPIO pins definition.
+ * @defgroup SSD1306_PIN_SPEC SSD1306 GPIO pins definition.
  * DC and RST Pins Definitions for SSD1306 Interface.
  *
- * @defgroup SSD1306_PIN_SPEC
+ * @{
  */
+/** @brief Display (DC) pin GPIO instance initialization */
 static i2_gpio_inst_t ssd1306_DC  = { "ssd1306_DC",   SSD1306_PIN_DC };
+/** @brief Display (RST) GPIO instance initialization */
 static i2_gpio_inst_t ssd1306_RST = { "ssd1306_RST",  SSD1306_PIN_RST };
+/** @} */ /* SSD1306_PIN_SPEC */
 
 /**
- * Buffer displayed over LCD.
- * This will act as LAYER1 for display.
+ * @defgroup SSD1306_LAYER_BUFFER_SPEC SSD1306  display buffers.
+ * This will act as LAYER1 and LAYER2 for display.
  *
- * @defgroup SSD1306_LAYER_BUFFER_SPEC
+ * @{
  */
+/** @brief Layer 1 (or default) display buffer */
 static uint8_t ssd1306_buffer_layer1[SSD1306_DISPLAY_WIDTH *     \
                               SSD1306_DISPLAY_HEIGHT / 8];
 #if ( SSD1306_MULTILAYER_SUPPORT == I2_ENABLE )
+/** @brief Layer 2 display buffer when multi-layer display is enabled */
 static uint8_t ssd1306_buffer_layer2[SSD1306_DISPLAY_WIDTH *    \
                                      SSD1306_DISPLAY_HEIGHT / 8];
 #endif /* SSD1306_MULTILAYER_SUPPORT */
-
+/** @} */ /* SSD1306_LAYER_BUFFER_SPEC */
 
 /**
-  * SPI write.
-  * Writes a single byte to SPI.
-  *
-  * @param [in] byte : data to send.
-  * @return None.
-  */
+ * @brief   SPI write.
+ * @details Writes a single byte to SPI.
+ *
+ * @param[in] byte      data to send.
+ * @return  None.
+ */
 void ssd1306_write_byte(uint8_t byte)
 {
-  if ( i2_spi_tx(&ssd1306, I2_SPI_DATA_WIDTH_8BIT, I2_SPI_CLK_20_MHZ,
-       I2_SPI_MODE_0, I2_SPI_MSBIT_FIRST, &byte, 1,
-       SSD1306_SPI_TIMEOUT) == I2_SUCCESS) {
+  if (i2_spi_tx(&ssd1306, I2_SPI_DATA_WIDTH_8BIT, I2_SPI_CLK_20_MHZ,
+      I2_SPI_MODE_0, I2_SPI_MSBIT_FIRST, &byte, 1,
+      SSD1306_SPI_TIMEOUT) == I2_SUCCESS) {
     i2_assert(0);
   }
 }
 
 /**
-  * SPI buffer write.
-  * Writes data buffer over SPI.
-  *
-  * @param [in] buff : buffer to send.
-  * @param [in] bytes_to_write : number of bytes.
-  * @return None.
-  */
+ * @brief   SPI buffer write.
+ * @details Writes data buffer over SPI.
+ *
+ * @param[in] buff             Buffer to send.
+ * @param[in] bytes_to_write   Number of bytes.
+ * @return  None.
+ */
 void ssd1306_write_buffer(uint8_t* buff, uint16_t bytes_to_write)
 {
-  if ( i2_spi_tx(&ssd1306, I2_SPI_DATA_WIDTH_8BIT, I2_SPI_CLK_20_MHZ,
-       I2_SPI_MODE_0, I2_SPI_MSBIT_FIRST, buff, bytes_to_write,
-       SSD1306_SPI_TIMEOUT) == I2_SUCCESS) {
+  if (i2_spi_tx(&ssd1306, I2_SPI_DATA_WIDTH_8BIT, I2_SPI_CLK_20_MHZ,
+      I2_SPI_MODE_0, I2_SPI_MSBIT_FIRST, buff, bytes_to_write,
+      SSD1306_SPI_TIMEOUT) == I2_SUCCESS) {
     i2_assert(0);
   }
 }
 
 /**
-  * Writes a command to display.
-  * Asserts DC pin in command mode and writes SPI byte.
-  *
-  * @param [in] c : command to write.
-  * @return None.
-  */
+ * @brief   Writes a command to display.
+ * @details Asserts DC pin in command mode and writes SPI byte.
+ *
+ * @param[in] c     Command to write.
+ * @return  None.
+ */
 #define SSD1306_CMD(c)    do {  \
                             i2_gpio_set(&ssd1306_DC, I2_LOW); \
                             ssd1306_write_byte( c );  \
                           } while (0);
 
 /**
-  * Writes a data byte to display.
-  * Asserts DC pin in data mode and writes SPI byte.
-  *
-  * @param [in] c : data byte to write.
-  * @return None.
-  */
-#define SSD1306_DATA(c)   do {  \
+ * @brief   Writes a data byte to display.
+ * @details Asserts DC pin in data mode and writes SPI byte.
+ *
+ * @param[in] d     Data byte to write.
+ * @return  None.
+ */
+#define SSD1306_DATA(d)   do {  \
                             i2_gpio_set(&ssd1306_DC, I2_HIGH);  \
-                            ssd1306_write_byte( c );  \
+                            ssd1306_write_byte( d );  \
                           } while (0);  \
 
 /**
-  * Initializes SSD1306 LCD display.
-  * Initialize Hardware for SPI and GPIO also LCD reset sequence.
-  *
-  * @param [in] vcc_state : display VCC connection state.
-  * @return None.
-  */
-void  ssd1306_init(uint8_t vcc_state)
+ * @brief   Initializes SSD1306 LCD display.
+ * @details Initialize Hardware for SPI and GPIO also LCD reset sequence.
+ *
+ * @param[in] vcc_state   Display VCC connection state.
+ * @return  None.
+ */
+void ssd1306_init(uint8_t vcc_state)
 {
-  if ( i2_gpio_is_valid(&ssd1306_DC) ) {
+  if (i2_gpio_is_valid(&ssd1306_DC)) {
     i2_gpio_config_out(&ssd1306_DC, false);
   }
 
-  if ( i2_gpio_is_valid(&ssd1306_RST) ) {
+  if (i2_gpio_is_valid(&ssd1306_RST)) {
     i2_gpio_config_out(&ssd1306_RST, false);
   }
 
   /* Initialize SPI interface */
-  i2_spi_init( &ssd1306 );
+  i2_spi_init(&ssd1306);
 
   /* Start Initialization by bringing RESET HIGH */
   i2_gpio_set(&ssd1306_RST, I2_HIGH);
@@ -184,7 +193,7 @@ void  ssd1306_init(uint8_t vcc_state)
   SSD1306_CMD(SSD1306_OFFSET_NULL);
   SSD1306_CMD(SSD1306_CMD_SET_START_LINE | SSD1306_LINE_0);
   SSD1306_CMD(SSD1306_CMD_CHARGE_PUMP);
-  if ( vcc_state == SSD1306_CMD_EXTERNAL_VCC ) {
+  if (vcc_state == SSD1306_CMD_EXTERNAL_VCC) {
     SSD1306_CMD(SSD1306_CHARGE_PUMP_DISABLE);
   } else {
     SSD1306_CMD(SSD1306_CHARGE_PUMP_ENABLE);
@@ -197,14 +206,14 @@ void  ssd1306_init(uint8_t vcc_state)
   SSD1306_CMD(SSD1306_CMD_SET_COM_PINS);
   SSD1306_CMD(SSD1306_COM_PINS_ALT | SSD1306_COM_PINS_DISABLE_REMAP);
   SSD1306_CMD(SSD1306_CMD_SET_CONTRAST);
-  if ( vcc_state == SSD1306_CMD_EXTERNAL_VCC ) {
+  if (vcc_state == SSD1306_CMD_EXTERNAL_VCC) {
     SSD1306_CMD(SSD1306_EXTERNAL_VCC_CONTRAST);
   } else {
     SSD1306_CMD(SSD1306_SWITCH_CAP_VCC_CONTRAST);
   }
 
   SSD1306_CMD(SSD1306_CMD_SET_PRECHARGE);
-  if ( vcc_state == SSD1306_CMD_EXTERNAL_VCC ) {
+  if (vcc_state == SSD1306_CMD_EXTERNAL_VCC) {
     SSD1306_CMD(SSD1306_PRECHARGE_PHASE1_DEFAULT |
                 SSD1306_PRECHARGE_PHASE2_DEFAULT);
   } else {
@@ -221,11 +230,10 @@ void  ssd1306_init(uint8_t vcc_state)
 }
 
 /**
- * Renders the contents of the pixel buffer on the LCD.
- * Picks data from the two layers buffer.
+ * @brief   Renders the contents of the pixel buffer on the LCD.
+ * @details Picks data from the two layers buffer.
  *
- * @param None.
- * @return None.
+ * @return  None.
  */
 void ssd1306_refresh(void)
 {
@@ -242,15 +250,13 @@ void ssd1306_refresh(void)
   ssd1306_write_buffer( (uint8_t *)ssd1306_buffer_layer1,
                         sizeof(ssd1306_buffer_layer1));
 #endif /* SSD1306_MULTILAYER_SUPPORT */
-
 }
 
 /**
- * Enable the OLED panel.
- * Turn on display pixels.
+ * @brief   Enable the OLED panel.
+ * @details Turn on display pixels.
  *
- * @param None.
- * @return None.
+ * @return  None.
  */
 void ssd1306_turn_on(void)
 {
@@ -258,11 +264,10 @@ void ssd1306_turn_on(void)
 }
 
 /**
- * Disable the OLED panel.
- * Turn off display pixels.
+ * @brief   Disable the OLED panel.
+ * @details Turn off display pixels.
  *
- * @param None.
- * @return None.
+ * @return  None.
  */
 void ssd1306_turn_off(void)
 {
@@ -270,13 +275,15 @@ void ssd1306_turn_off(void)
 }
 
 /**
- * Draws a single pixel in image buffer.
- * Updates corresponding Layer buffer with pixel value.
+ * @brief   Draws a single pixel in image buffer.
+ * @details Updates corresponding Layer buffer with pixel value.
  *
- * @param [in] y : Vertical (y) position (0..63).
- * @param [in] x : horizontal (x) position (0..127).
- * @return None.
-*/
+ * @param[in] y         Vertical (y) position (0..63).
+ * @param[in] x         Horizontal (x) position (0..127).
+ * @param[in] color     Color of line to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer     Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_pixel(int16_t y, int16_t x, uint16_t color, uint16_t layer)
 {
   if ((x >= SSD1306_DISPLAY_WIDTH) ||
@@ -286,8 +293,8 @@ void ssd1306_draw_pixel(int16_t y, int16_t x, uint16_t color, uint16_t layer)
     return;
   }
 
-  if ( layer & SSD1306_LAYER1 ) {
-    switch ( color ) {
+  if (layer & SSD1306_LAYER1) {
+    switch (color) {
     case SSD1306_WHITE :
       ssd1306_buffer_layer1[x+ (y/8)*SSD1306_DISPLAY_WIDTH] |=  (1 << (y&7));
       break;
@@ -301,8 +308,8 @@ void ssd1306_draw_pixel(int16_t y, int16_t x, uint16_t color, uint16_t layer)
   }
 
 #if ( SSD1306_MULTILAYER_SUPPORT == I2_ENABLE )
-   if ( layer & SSD1306_LAYER2 ) {
-    switch (color ) {
+   if (layer & SSD1306_LAYER2) {
+    switch (color) {
     case SSD1306_WHITE :
       ssd1306_buffer_layer2[x+ (y/8)*SSD1306_DISPLAY_WIDTH] |=  (1 << (y&7));
       break;
@@ -322,16 +329,16 @@ void ssd1306_draw_pixel(int16_t y, int16_t x, uint16_t color, uint16_t layer)
 }
 
 /**
- * Gets the value (1 or 0) of the specified pixel from the buffer.
- * Read corresponding Layer buffer with pixel value.
+ * @brief   Gets the value (1 or 0) of the specified pixel from the buffer.
+ * @details Read corresponding Layer buffer with pixel value.
  *
- * @param [in] y : Vertical (y) position (0..63).
- * @param [in] x : horizontal (x) position (0..127).
- * @return 1 if the pixel is set, 0 if clear.
-*/
+ * @param[in] y     Vertical (y) position (0..63).
+ * @param[in] x     Horizontal (x) position (0..127).
+ * @return  1 if the pixel is set, 0 if clear.
+ */
 uint8_t ssd1306_get_pixel(int16_t y, int16_t x)
 {
-  if( (x >= SSD1306_DISPLAY_WIDTH) ||
+  if ((x >= SSD1306_DISPLAY_WIDTH) ||
       (x < 0) ||
       (y >= SSD1306_DISPLAY_HEIGHT) ||
       (y < 0)) {
@@ -343,13 +350,13 @@ uint8_t ssd1306_get_pixel(int16_t y, int16_t x)
 }
 
 /**
- * Clears a single pixel in image buffer.
- * Updates corresponding Layer buffer with pixel value.
+ * @brief   Clears a single pixel in image buffer.
+ * @details Updates corresponding Layer buffer with pixel value.
  *
- * @param [in] y : Vertical (y) position (0..63).
- * @param [in] x : horizontal (x) position (0..127).
- * @return None.
-*/
+ * @param[in] y     Vertical (y) position (0..63).
+ * @param[in] x     Horizontal (x) position (0..127).
+ * @return  None.
+ */
 void ssd1306_clear_pixel(int16_t y, int16_t x)
 {
   if ((x >= SSD1306_DISPLAY_WIDTH) ||
@@ -368,14 +375,14 @@ void ssd1306_clear_pixel(int16_t y, int16_t x)
 }
 
 /**
- * Clears a character from screen.
- * Updates corresponding Layer buffer with pixel value.
+ * @brief   Clears a character from screen.
+ * @details Updates corresponding Layer buffer with pixel value.
  *
- * @param [in] y : Vertical (y) position (0..63).
- * @param [in] x : horizontal (x) position (0..127).
- * @param [in] size : Character size to clear @ref SSD1306_TEXT_SPEC.
- * @return None.
-*/
+ * @param[in] y         Vertical (y) position (0..63).
+ * @param[in] x         Horizontal (x) position (0..127).
+ * @param[in] size      Character size to clear @ref SSD1306_TEXT_SPEC.
+ * @return  None.
+ */
 void ssd1306_clear_char(int16_t y, int16_t x, uint8_t size)
 {
   uint8_t i = 0;
@@ -423,12 +430,12 @@ void ssd1306_clear_char(int16_t y, int16_t x, uint8_t size)
 }
 
 /**
- * Clears the screen.
- * Clears corresponding Layer buffer.
+ * @brief   Clears the screen.
+ * @details Clears corresponding Layer buffer.
  *
- * @param [in] layer : Required layer to be cleared @SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] layer  Required layer to be cleared @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_clear_screen(uint16_t layer)
 {
   if (layer & SSD1306_LAYER1) {
@@ -443,17 +450,17 @@ void ssd1306_clear_screen(uint16_t layer)
 }
 
 /**
- * Draws a straight line from point A to point B.
- * Draws a line between two coordinates.
+ * @brief   Draws a straight line from point A to point B.
+ * @details Draws a line between two coordinates.
  *
- * @param [in] y0 : (y) coordinate for beginning point A.
- * @param [in] x0 : (x) coordinate for beginning point A.
- * @param [in] y1 : (y) coordinate for terminating point B.
- * @param [in] x1 : (x) coordinate for terminating point B.
- * @param [in] color : Color of line to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y0      Vertical (y) position for beginning point A.
+ * @param[in] x0      Horizontal (x) position for beginning point A.
+ * @param[in] y1      Vertical (y) position for terminating point B.
+ * @param[in] x1      Horizontal (x) position for terminating point B.
+ * @param[in] color   Color of line to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_line(int16_t y0, int16_t x0, int16_t y1, int16_t x1,
                       uint16_t color, uint16_t layer)
 {
@@ -462,12 +469,12 @@ void ssd1306_draw_line(int16_t y0, int16_t x0, int16_t y1, int16_t x1,
   int16_t err = 0;
   int16_t ystep = 0;
 
-  if ( steep ) {
+  if (steep) {
     SSD1306_SWAP(x0, y0);
     SSD1306_SWAP(x1, y1);
   }
 
-  if ( x0 > x1 ) {
+  if (x0 > x1) {
     SSD1306_SWAP(x0, x1);
     SSD1306_SWAP(y0, y1);
   }
@@ -476,20 +483,20 @@ void ssd1306_draw_line(int16_t y0, int16_t x0, int16_t y1, int16_t x1,
   dy = abs(y1 - y0);
   err = dx / 2;
 
-  if ( y0 < y1 ) {
+  if (y0 < y1) {
     ystep = 1;
   } else {
     ystep = -1;
   }
 
   for (; x0<=x1; x0++) {
-    if ( steep ) {
+    if (steep) {
       ssd1306_draw_pixel(x0, y0, color, layer);
     } else {
       ssd1306_draw_pixel(y0, x0, color, layer);
     }
     err -= dy;
-    if ( err < 0 ) {
+    if (err < 0) {
       y0 += ystep;
       err += dx;
     }
@@ -497,16 +504,16 @@ void ssd1306_draw_line(int16_t y0, int16_t x0, int16_t y1, int16_t x1,
 }
 
 /**
- * Draws a vertical line.
- * Draws a vertical line from a beginning coordinate to certain length.
+ * @brief   Draws a vertical line.
+ * @details Draws a vertical line from a beginning coordinate to certain length.
  *
- * @param [in] y : (y) coordinate to draw.
- * @param [in] x : (x) coordinate to draw.
- * @param [in] h : length of line to draw.
- * @param [in] color : Color of line to draw  @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       Vertical (y) coordinate to draw.
+ * @param[in] x       Horizontal (x) coordinate to draw.
+ * @param[in] h       length of line to draw.
+ * @param[in] color   Color of line to draw  @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_fast_vline(int16_t y, int16_t x, int16_t h,
                              uint16_t color, uint16_t layer)
 {
@@ -514,16 +521,16 @@ void ssd1306_draw_fast_vline(int16_t y, int16_t x, int16_t h,
 }
 
 /**
- * Draws a vertical line.
- * Draws a vertical line from a beginning coordinate to certain length.
+ * @brief   Draws a vertical line.
+ * @details Draws a vertical line from a beginning coordinate to certain length.
  *
- * @param [in] y : (y) coordinate to draw.
- * @param [in] x : (x) coordinate to draw.
- * @param [in] w : length of line to draw.
- * @param [in] color : Color of line to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate to draw.
+ * @param[in] x       (x) coordinate to draw.
+ * @param[in] w       length of line to draw.
+ * @param[in] color   Color of line to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw line @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_fast_hline(int16_t y, int16_t x, int16_t w,
                              uint16_t color, uint16_t layer)
 {
@@ -531,27 +538,27 @@ void ssd1306_draw_fast_hline(int16_t y, int16_t x, int16_t w,
 }
 
 /**
- * Draws a polygon.
- * Draws a polygon from n number of points.
+ * @brief   Draws a polygon.
+ * @details Draws a polygon from n number of points.
  *
- * @param [in] poly : SSD1306 polygon parameter @ref SSD1306_POLYGON_SPEC.
- * @param [in] y : (y) coordinate to draw.
- * @param [in] x : (x) coordinate to draw.
- * @param [in] color : Color of polygon to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw polygon @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] poly    SSD1306 polygon parameter @ref SSD1306_POLYGON_SPEC.
+ * @param[in] y       (y) coordinate to draw.
+ * @param[in] x       (x) coordinate to draw.
+ * @param[in] color   Color of polygon to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw polygon @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_polygon(ssd1306_poly_t* poly,
                          int16_t y, int16_t x,
                          uint16_t color, uint16_t layer)
 {
   int16_t i = 0;
 
-  if ( poly->points_count < 2 ) {
+  if (poly->corners < 2) {
     return;
   }
 
-  for (i=0; i<(poly->points_count - 1); i++) {
+  for (i=0; i<(poly->corners - 1); i++) {
     ssd1306_draw_line(round(poly->point[i].y + y),
                      round(poly->point[i].x + x),
                      round(poly->point[i+1].y + y),
@@ -566,16 +573,16 @@ void ssd1306_draw_polygon(ssd1306_poly_t* poly,
 }
 
 /**
- * Draws a filled polygon.
- * Details: http://alienryderflex.com/polygon_fill/.
+ * @brief   Draws a filled polygon.
+ * @details http://alienryderflex.com/polygon_fill/.
  *
- * @param [in] poly : SSD1306 polygon parameter @ref SSD1306_POLYGON_SPEC.
- * @param [in] y : (y) coordinate to draw.
- * @param [in] x : (x) coordinate to draw.
- * @param [in] color : Color of polygon to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw polygon @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] poly    SSD1306 polygon parameter @ref SSD1306_POLYGON_SPEC.
+ * @param[in] y       (y) coordinate to draw.
+ * @param[in] x       (x) coordinate to draw.
+ * @param[in] color   Color of polygon to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw polygon @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_fill_polygon(ssd1306_poly_t* poly, double y, double x,
                          uint16_t color, uint16_t layer)
 {
@@ -586,7 +593,7 @@ void ssd1306_fill_polygon(ssd1306_poly_t* poly, double y, double x,
   /* draw shape */
   ssd1306_draw_polygon(poly, (int16_t)y, (int16_t)x, color, layer);
   /* copy polygon */
-  i = poly->points_count - 1;
+  i = poly->corners - 1;
   while (i >= 0) {
     polyX[i] = round(poly->point[i].x + x);
     polyY[i] = round(poly->point[i].y + y);
@@ -596,9 +603,9 @@ void ssd1306_fill_polygon(ssd1306_poly_t* poly, double y, double x,
   for (pixelY=0; pixelY<SSD1306_DISPLAY_HEIGHT; pixelY++) {
     /* Build a list of nodes */
     nodes = 0;
-    j = poly->points_count - 1;
-    for (i=0; i<poly->points_count; i++) {
-      if( (polyY[i]<(double) pixelY && polyY[j]>=(double) pixelY) ||
+    j = poly->corners - 1;
+    for (i=0; i<poly->corners; i++) {
+      if ((polyY[i]<(double) pixelY && polyY[j]>=(double) pixelY) ||
           (polyY[j]<(double) pixelY && polyY[i]>=(double) pixelY)) {
         nodeX[nodes++] = (int)round(  polyX[i] +
                                       (pixelY-polyY[i])/(polyY[j]-polyY[i]) *
@@ -614,7 +621,7 @@ void ssd1306_fill_polygon(ssd1306_poly_t* poly, double y, double x,
         swap = nodeX[i];
         nodeX[i] = nodeX[i+1];
         nodeX[i+1] = swap;
-        if(i) {
+        if (i) {
           i--;
         }
       } else {
@@ -643,13 +650,13 @@ void ssd1306_fill_polygon(ssd1306_poly_t* poly, double y, double x,
 }
 
 /**
- * Fill the complete screen.
- * Draws a rectangle to fills complete screen.
+ * @brief   Fill the complete screen.
+ * @details Draws a rectangle to fills complete screen.
  *
- * @param [in] color : Color to fill on screen @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to be filled @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] color   Color to fill on screen @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to be filled @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_fill_screen(uint16_t color, uint16_t layer)
 {
   ssd1306_fill_rectangle( 0, 0, SSD1306_DISPLAY_HEIGHT, SSD1306_DISPLAY_WIDTH,
@@ -657,16 +664,16 @@ void ssd1306_fill_screen(uint16_t color, uint16_t layer)
 }
 
 /**
- * Draws a circle.
- * Draws a vertical line from a beginning coordinate to certain length.
+ * @brief   Draws a circle.
+ * @details Draws a vertical line from a beginning coordinate to certain length.
  *
- * @param [in] y0 : (y) coordinate of circle's center.
- * @param [in] x0 : (x) coordinate of circle's center.
- * @param [in] r : radius of circle to draw.
- * @param [in] color : Color of circle to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw circle @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y0      (y) coordinate of circle's center.
+ * @param[in] x0      (x) coordinate of circle's center.
+ * @param[in] r       radius of circle to draw.
+ * @param[in] color   Color of circle to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw circle @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_circle( uint8_t y0, uint8_t x0, uint8_t r,
                           uint16_t color, uint16_t layer)
 {
@@ -675,7 +682,7 @@ void ssd1306_draw_circle( uint8_t y0, uint8_t x0, uint8_t r,
   /* Decision criterion divided by 2 evaluated at x=r, y=0 */
   int check_point = 1 - x;
 
-  if(x < 0) {
+  if (x < 0) {
     return;
   }
 
@@ -693,7 +700,7 @@ void ssd1306_draw_circle( uint8_t y0, uint8_t x0, uint8_t r,
     if (check_point <= 0) {
       /* Change in decision criterion for y -> y+1 */
       check_point += 2 * y + 1;
-    } else {\
+    } else {
       x--;
       /* Change for y -> y+1, x -> x-1 */
       check_point += 2 * (y - x) + 1;
@@ -702,20 +709,19 @@ void ssd1306_draw_circle( uint8_t y0, uint8_t x0, uint8_t r,
 }
 
 /**
- * Draws a circle helper.
- * Draws a circle helper name.
+ * @brief   Draws a circle helper.
+ * @details Draws a circle helper name.
  *
- * @param [in] y0 : (y) coordinate of circle's center.
- * @param [in] x0 : (x) coordinate of circle's center.
- * @param [in] r : radius of circle to draw.
- * @param [in] corner_name : corner name to display.
- * @param [in] color : Color of circle helper to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y0      (y) coordinate of circle's center.
+ * @param[in] x0      (x) coordinate of circle's center.
+ * @param[in] r       Radius of circle to draw.
+ * @param[in] corner  corner name to display.
+ * @param[in] color   Color of circle helper to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_circle_helper(int16_t y0, int16_t x0, int16_t r,
-                                uint8_t corner_name,
-                                uint16_t color, uint16_t layer)
+                                uint8_t corner, uint16_t color, uint16_t layer)
 {
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
@@ -733,22 +739,22 @@ void ssd1306_draw_circle_helper(int16_t y0, int16_t x0, int16_t r,
     ddF_x += 2;
     f += ddF_x;
 
-    if (corner_name & 0x8) {
+    if (corner & 0x8) {
       ssd1306_draw_pixel(y0 + x, x0 - y, color, layer);
       ssd1306_draw_pixel(y0 + y, x0 - x, color, layer);
     }
 
-    if (corner_name & 0x4) {
+    if (corner & 0x4) {
       ssd1306_draw_pixel(y0 + y, x0 + x, color, layer);
       ssd1306_draw_pixel(y0 + x, x0 + y, color, layer);
     }
 
-    if (corner_name & 0x2) {
+    if (corner & 0x2) {
       ssd1306_draw_pixel(y0 - y, x0 + x, color, layer);
       ssd1306_draw_pixel(y0 - x, x0 + y, color, layer);
     }
 
-    if (corner_name & 0x1) {
+    if (corner & 0x1) {
       ssd1306_draw_pixel(y0 - x, x0 - y, color, layer);
       ssd1306_draw_pixel(y0 - y, x0 - x, color, layer);
     }
@@ -756,16 +762,16 @@ void ssd1306_draw_circle_helper(int16_t y0, int16_t x0, int16_t r,
 }
 
 /**
- * Draws a filled circle.
- * Fills circle with defined color.
+ * @brief   Draws a filled circle.
+ * @details Fills circle with defined color.
  *
- * @param [in] y0 : (y) coordinate of circle's center.
- * @param [in] x0 : (x) coordinate of circle's center.
- * @param [in] r : radius of circle to draw.
- * @param [in] color : Color of circle to fill @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to fill circle @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y0      (y) coordinate of circle's center.
+ * @param[in] x0      (x) coordinate of circle's center.
+ * @param[in] r       Radius of circle to draw.
+ * @param[in] color   Color of circle to fill @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to fill circle @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_fill_circle( int16_t y0, int16_t x0, int16_t r,
                           uint16_t color, uint16_t layer)
 {
@@ -774,20 +780,20 @@ void ssd1306_fill_circle( int16_t y0, int16_t x0, int16_t r,
 }
 
 /**
- * Draws a filled the circle helper.
- * Used to do circles and round rectangles.
+ * @brief   Draws a filled the circle helper.
+ * @details Used to do circles and round rectangles.
  *
- * @param [in] y0 : (y) coordinate of circle's center.
- * @param [in] x0 : (x) coordinate of circle's center.
- * @param [in] r : radius of circle to draw.
- * @param [in] corner_name : corner name to display.
- * @param [in] delta : delta for rounding.
- * @param [in] color : Color of circle to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to fill @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y0      (y) coordinate of circle's center.
+ * @param[in] x0      (x) coordinate of circle's center.
+ * @param[in] r       Radius of circle to draw.
+ * @param[in] corner  Corner name to display.
+ * @param[in] delta   delta for rounding.
+ * @param[in] color   Color of circle to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to fill @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_fill_circle_helper(int16_t y0, int16_t x0, int16_t r,
-                                uint8_t corner_name, int16_t delta,
+                                uint8_t corner, int16_t delta,
                                 uint16_t color, uint16_t layer)
 {
   int16_t f     = 1 - r;
@@ -796,7 +802,7 @@ void ssd1306_fill_circle_helper(int16_t y0, int16_t x0, int16_t r,
   int16_t x     = 0;
   int16_t y     = r;
 
-  while ( x<y ) {
+  while (x<y) {
     if (f >= 0) {
       y--;
       ddF_y += 2;
@@ -806,11 +812,11 @@ void ssd1306_fill_circle_helper(int16_t y0, int16_t x0, int16_t r,
     ddF_x += 2;
     f += ddF_x;
 
-    if ( corner_name & 0x1 ) {
+    if (corner & 0x1 ) {
       ssd1306_draw_fast_vline(y0-y, x0+x, 2*y+1+delta, color, layer);
       ssd1306_draw_fast_vline(y0-x, x0+y, 2*x+1+delta, color, layer);
     }
-    if ( corner_name & 0x2 ) {
+    if (corner & 0x2 ) {
       ssd1306_draw_fast_vline(y0-y, x0-x, 2*y+1+delta, color, layer);
       ssd1306_draw_fast_vline(y0-x, x0-y, 2*x+1+delta, color, layer);
     }
@@ -818,23 +824,25 @@ void ssd1306_fill_circle_helper(int16_t y0, int16_t x0, int16_t r,
 }
 
 /**
- * Draws a rectangle.
- * Draws a rectangle with beginning coordinates and provided height and breadth.
+ * @brief   Draws a rectangle.
+ * @details Draws a rectangle with beginning coordinates and provided height
+ *          and breadth.
  *
- * @param [in] y : (y) coordinate of rectangle beginning.
- * @param [in] x : (x) coordinate of rectangle beginning.
- * @param [in] h : height of rectangle.
- * @param [in] w : width of rectangle.
- * @param [in] color : Color of rectangle to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw rectangle @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate of rectangle beginning.
+ * @param[in] x       (x) coordinate of rectangle beginning.
+ * @param[in] h       Height of rectangle.
+ * @param[in] w       Width of rectangle.
+ * @param[in] color   Color of rectangle to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw rectangle @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_rectangle(int16_t y, int16_t x, int16_t h, int16_t w,
                             uint16_t color, uint16_t layer)
 {
   int16_t x1, y1;
-  if((w == 0) | (h == 0))
+  if ((w == 0) | (h == 0)) {
     return;
+  }
   x1 = x + w - 1;
   y1 = y + h - 1;
 
@@ -850,17 +858,17 @@ void ssd1306_draw_rectangle(int16_t y, int16_t x, int16_t h, int16_t w,
 }
 
 /**
- * Draws a filled rectangle.
- * Used to do circles and round rectangles.
+ * @brief   Draws a filled rectangle.
+ * @details Used to do circles and round rectangles.
  *
- * @param [in] y : (y) coordinate of rectangle beginning.
- * @param [in] x : (x) coordinate of rectangle beginning.
- * @param [in] h : height of rectangle.
- * @param [in] w : width of rectangle.
- * @param [in] color : Color of rectangle to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate of rectangle beginning.
+ * @param[in] x       (x) coordinate of rectangle beginning.
+ * @param[in] h       Height of rectangle.
+ * @param[in] w       Width of rectangle.
+ * @param[in] color   Color of rectangle to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_fill_rectangle(uint8_t y, uint8_t x, uint8_t h, uint8_t w,
                             uint16_t color, uint16_t layer)
 {
@@ -877,17 +885,18 @@ void ssd1306_fill_rectangle(uint8_t y, uint8_t x, uint8_t h, uint8_t w,
 }
 
 /**
- * Draws a bitmap on the screen.
- * Used to draw bitmap image of defined size.
+ * @brief   Draws a bitmap on the screen.
+ * @details Used to draw bitmap image of defined size.
  *
- * @param [in] y : (y) coordinate of bitmap beginning.
- * @param [in] x : (x) coordinate of bitmap beginning.
- * @param [in] h : height of bitmap image.
- * @param [in] w : width of bitmap image.
- * @param [in] color : Color of bitmap to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw bitmap @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate of bitmap beginning.
+ * @param[in] x       (x) coordinate of bitmap beginning.
+ * @param[in] bitmap  Bitmap image for displaying.
+ * @param[in] h       Height of bitmap image.
+ * @param[in] w       Width of bitmap image.
+ * @param[in] color   Color of bitmap to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw bitmap @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_bitmap( int16_t y, int16_t x, uint8_t *bitmap,
                           int16_t h, int16_t w, uint16_t color, uint16_t layer)
 {
@@ -905,17 +914,17 @@ void ssd1306_draw_bitmap( int16_t y, int16_t x, uint8_t *bitmap,
 }
 
 /**
- * Writes a character on the screen.
- * By Default 8514oem character set is used to display.
+ * @brief   Writes a character on the screen.
+ * @details By Default 8514oem character set is used to display.
  *
- * @param [in] y : (y) coordinate to write.
- * @param [in] x : (x) coordinate to write.
- * @param [in] c : character to display.
- * @param [in] size : character size to display @ref SSD1306_TEXT_SPEC.
- * @param [in] color : Color of char to write @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to draw bitmap @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate to write.
+ * @param[in] x       (x) coordinate to write.
+ * @param[in] c       Character to display.
+ * @param[in] size    Character size to display @ref SSD1306_TEXT_SPEC.
+ * @param[in] color   Color of char to write @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to draw bitmap @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void ssd1306_draw_char(int16_t y, int16_t x, uint16_t c, uint8_t size,
                        uint16_t color, uint16_t layer)
 {
@@ -964,17 +973,17 @@ void ssd1306_draw_char(int16_t y, int16_t x, uint16_t c, uint8_t size,
 }
 
 /**
- * Writes a character on the screen.
- * By Default 8514oem character set is used to display.
+ * @brief   Writes a character on the screen.
+ * @details By Default 8514oem character set is used to display.
  *
- * @param [in] y : (y) coordinate to write.
- * @param [in] x : (x) coordinate to write.
- * @param [in] c : character to display.
- * @param [in] size : character size to display @ref SSD1306_TEXT_SPEC.
- * @param [in] color : Color of char to write @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to write @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate to write.
+ * @param[in] x       (x) coordinate to write.
+ * @param[in] c       Character to display.
+ * @param[in] size    Character size to display @ref SSD1306_TEXT_SPEC.
+ * @param[in] color   Color of char to write @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to write @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void  ssd1306_draw_char_loc(int16_t y, int16_t x, uint16_t c, uint8_t size,
                             uint16_t color, uint16_t layer)
 {
@@ -990,17 +999,17 @@ void  ssd1306_draw_char_loc(int16_t y, int16_t x, uint16_t c, uint8_t size,
 }
 
 /**
- * Writes a string on the screen.
- * By Default 8514oem character set is used to display.
+ * @brief   Writes a string on the screen.
+ * @details By Default 8514oem character set is used to display.
  *
- * @param [in] y : (y) coordinate to write.
- * @param [in] x : (x) coordinate to write.
- * @param [in] text : character to display.
- * @param [in] size : character size to display @ref SSD1306_TEXT_SPEC.
- * @param [in] color : Color of char to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to write string @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate to write.
+ * @param[in] x       (x) coordinate to write.
+ * @param[in] text    Character to display.
+ * @param[in] size    Character size to display @ref SSD1306_TEXT_SPEC.
+ * @param[in] color   Color of char to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to write string @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void  ssd1306_draw_string(int16_t y, int16_t x, char *text, uint8_t size,
                           uint16_t color, uint16_t layer)
 {
@@ -1013,17 +1022,17 @@ void  ssd1306_draw_string(int16_t y, int16_t x, char *text, uint8_t size,
 }
 
 /**
- * Writes a string on the screen at specified location.
- * By Default 8514oem character set is used to display.
+ * @brief   Writes a string on the screen at specified location.
+ * @details By Default 8514oem character set is used to display.
  *
- * @param [in] y : (y) coordinate to write.
- * @param [in] x : (x) coordinate to write.
- * @param [in] text : character to display.
- * @param [in] size : character size to display @ref SSD1306_TEXT_SPEC.
- * @param [in] color : Color of char to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to write string @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate to write.
+ * @param[in] x       (x) coordinate to write.
+ * @param[in] text    Character to display.
+ * @param[in] size    Character size to display @ref SSD1306_TEXT_SPEC.
+ * @param[in] color   Color of char to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to write string @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void  ssd1306_draw_string_loc(int16_t y, int16_t x, char *text, uint8_t size,
                               uint16_t color, uint16_t layer)
 {
@@ -1035,18 +1044,18 @@ void  ssd1306_draw_string_loc(int16_t y, int16_t x, char *text, uint8_t size,
 }
 
 /**
- * Types a string on the screen at specified location.
- * By Default 8514oem character set is used to display.
+ * @brief   Types a string on the screen at specified location.
+ * @details By Default 8514oem character set is used to display.
  *
- * @param [in] y : (y) coordinate to write.
- * @param [in] x : (x) coordinate to write.
- * @param [in] text : character to display.
- * @param [in] size : character size to display @ref SSD1306_TEXT_SPEC.
- * @param [in] delay : Delay between writing two characters.
- * @param [in] color : Color of char to draw @ref SSD1306_COLOR_SPEC.
- * @param [in] layer : Layer to write string @ref SSD1306_MULTI_LAYER_SPEC.
- * @return None.
-*/
+ * @param[in] y       (y) coordinate to write.
+ * @param[in] x       (x) coordinate to write.
+ * @param[in] text    Character to display.
+ * @param[in] size    Character size to display @ref SSD1306_TEXT_SPEC.
+ * @param[in] delay   Delay between writing two characters.
+ * @param[in] color   Color of char to draw @ref SSD1306_COLOR_SPEC.
+ * @param[in] layer   Layer to write string @ref SSD1306_MULTI_LAYER_SPEC.
+ * @return  None.
+ */
 void  ssd1306_type_string_loc(int16_t y, int16_t x, char *text, uint8_t size,
                               uint8_t delay, uint16_t color, uint16_t layer)
 {
@@ -1066,14 +1075,14 @@ void  ssd1306_type_string_loc(int16_t y, int16_t x, char *text, uint8_t size,
 }
 
 /**
- * Shifts the content of frame buffer up the specified number of pixels.
- * Layer 1 will have shifting options and
- * a blank space will be added at bottom after shifting.
+ * @brief   Shifts content of frame buffer up the specified number of pixels.
+ * @details Layer 1 will have shifting options and a blank space will be added
+ *          at bottom after shifting.
  *
- * @param [in] height : Number of pixels to shift the frame buffer up.
- * @param [in] direction : direction to shift in.
- * @return None.
-*/
+ * @param[in] height    Number of pixels to shift the frame buffer up.
+ * @param[in] direction Direction to shift in.
+ * @return  None.
+ */
 void ssd1306_shift_frame_buffer(uint16_t height, uint16_t direction)
 {
   int16_t y = 0;
@@ -1086,11 +1095,11 @@ void ssd1306_shift_frame_buffer(uint16_t height, uint16_t direction)
   while (height > 0)
   {
 #endif /* 0 */
-    switch ( direction ) {
+    switch (direction) {
     case 0 :
       /* This is horribly inefficient, but at least easy to understand. */
       /* In a production environment, this should be significantly optimized */
-      if ( height >= SSD1306_DISPLAY_HEIGHT ) {
+      if (height >= SSD1306_DISPLAY_HEIGHT) {
         /* Clear the entire frame buffer */
         ssd1306_clear_screen(SSD1306_LAYER1);
         return;
@@ -1114,8 +1123,8 @@ void ssd1306_shift_frame_buffer(uint16_t height, uint16_t direction)
       x = y;
       for (x=SSD1306_COUNTOF(ssd1306_buffer_layer1)-1; x>=0; x--) {
         ssd1306_buffer_layer1[x] = ssd1306_buffer_layer1[x] << height;
-        if ( ((x - (int16_t)SSD1306_COUNTOF(ssd1306_buffer_layer1)/8) >= 0) &&
-             ((ssd1306_buffer_layer1[x - SSD1306_COUNTOF(ssd1306_buffer_layer1)/8] & 0x80) == 0x80)) {
+        if (((x - (int16_t)SSD1306_COUNTOF(ssd1306_buffer_layer1)/8) >= 0) &&
+            ((ssd1306_buffer_layer1[x - SSD1306_COUNTOF(ssd1306_buffer_layer1)/8] & 0x80) == 0x80)) {
           ssd1306_buffer_layer1[x] = ssd1306_buffer_layer1[x] | 0x01;
         }
       }
@@ -1146,12 +1155,12 @@ void ssd1306_shift_frame_buffer(uint16_t height, uint16_t direction)
 }
 
 /**
- * Inserts time delay.
- * Need to handle blocking and non blocking both delays.
+ * @brief   Inserts time delay.
+ * @details Need to handle blocking and non blocking both delays.
  *
- * @param [in] nCount : Delay count in ms.
- * @return None.
-*/
+ * @param[in] nCount    Delay count in ms.
+ * @return  None.
+ */
 void ssd1306_delay(__IO uint32_t nCount)
 {
   __IO uint32_t index = 0;
@@ -1161,12 +1170,11 @@ void ssd1306_delay(__IO uint32_t nCount)
 
 #if ( SSD1306_MULTILAYER_SUPPORT == I2_ENABLE )
 /**
- * Mixes both layers together.
- * Mixes both layers buffer together.
+ * @brief   Mixes both layers together.
+ * @details Mixes both layers buffer together.
  *
- * @param None.
- * @return None.
-*/
+ * @return  None.
+ */
 void ssd1306_mix_frame_buffer(void)
 {
   uint16_t i;
@@ -1176,4 +1184,4 @@ void ssd1306_mix_frame_buffer(void)
 }
 #endif /* SSD1306_MULTILAYER_SUPPORT */
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

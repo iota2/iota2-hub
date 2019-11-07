@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        07-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        07-09-2019
+ * @file        main.c
+ * @brief       iota2 HUB application.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,10 +36,12 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+/** @brief UART definition for console application */
 static i2_uart_inst_t uart_console = {
   "console", "USART1",
 };
 
+/** @brief SPI definition for external flash */
 static i2_spi_inst_t ext_flash = {
     "extflash", "SPI1", { "extflash_CS", GPIOG, GPIO_PIN_15 }
 };
@@ -43,10 +50,12 @@ static i2_spi_inst_t ext_flash = {
 /* Private functions ---------------------------------------------------------*/
 
 /**
-  * @brief  User task
-  * @param  pvParameters : Imported parameters to be used in task
-  * @retval None
-  */
+ * @brief   User task.
+ * @details Generic user task.
+ *
+ * @param[in] pvParameters    Imported parameters to be used in task.
+ * @retval  None.
+ */
 void HUB_taskUSER( void * pvParameters )
 {
   /* The parameter value is expected to be 1 as 1 is passed in the
@@ -66,10 +75,11 @@ void HUB_taskUSER( void * pvParameters )
 }
 
 /**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
+ * @brief   Main program.
+ * @details This is program entry function and should not exit this funciton.
+ *
+ * @retval  Returns error code.
+ */
 int main(void)
 {
   BaseType_t    HUB_statusHandle;
@@ -107,12 +117,14 @@ int main(void)
 
 #ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief   Assert API.
+ * @details Reports the name of the source file and the source line number
+ *          where the assert_param error has occurred.
+ *
+ * @param[in] file    pointer to the source file name.
+ * @param[in] line    assert_param error line source number.
+ * @retval   None.
+ */
 void assert_failed(uint8_t* file, uint32_t line)
 {
   /* User can add his own implementation to report the file name and line number,
@@ -125,13 +137,4 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
-
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

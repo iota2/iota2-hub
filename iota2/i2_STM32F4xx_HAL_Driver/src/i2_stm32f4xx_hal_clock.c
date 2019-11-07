@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_stm32f4xx_hal_clock.c
+ * @brief       HAL clock set-up.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,9 +33,15 @@
 #include "i2_stm32f4xx_hal_clock.h"
 
 /* Private variables ---------------------------------------------------------*/
-static bool lse_on = false;
+static bool lse_on = false;   /**< LSE on/off state */
 
 /* Private functions ---------------------------------------------------------*/
+/**
+ * @brief   Common clock configurations.
+ * @details Initializes Clock PLL.
+ *
+ * @return  None.
+ */
 static void common_clock_config(void)
 {
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -65,16 +76,22 @@ static void common_clock_config(void)
 }
 
 /* Public functions ----------------------------------------------------------*/
-/*
- * Return true if LSE is on and used for RTC.
+/**
+ * @brief   Check LSE state.
+ * @details Checks of state of LSE is enabled or not.
+ *
+ * @return  True if LSE is on and used for RTC.
  */
 bool i2_is_lse_on(void)
 {
   return lse_on;
 }
 
-/*
- * Use external clocks. HSE drives PLL.LSE drives RTC.
+/**
+ * @brief   Use external clocks.
+ * @details Configures HSE to drives PLL and LSE to drives RTC.
+ *
+ * @return  None.
  */
 void i2_hse_lse_clock_config(void)
 {
@@ -106,8 +123,11 @@ void i2_hse_lse_clock_config(void)
   common_clock_config();
 }
 
-/*
- * Use internal clocks. HSI drives PLL. LSI drives RTC.
+/**
+ * @brief   Use internal clocks.
+ * @details Configure HSI to drives PLL and LSI to drives RTC.
+ *
+ * @return  None.
  */
 void i2_hsi_lsi_clock_config(void)
 {
@@ -139,8 +159,11 @@ void i2_hsi_lsi_clock_config(void)
   common_clock_config();
 }
 
-/*
- * Use external / internal clocks. HSE drives PLL. LSI drives RTC.
+/**
+ * @brief   Use external / internal clocks.
+ * @details Configure HSE to drives PLL and LSI to drives RTC.
+ *
+ * @return  None.
  */
 void i2_hse_lsi_clock_config(void)
 {
@@ -172,8 +195,11 @@ void i2_hse_lsi_clock_config(void)
   common_clock_config();
 }
 
-/*
- * Use external / internal clocks. HSI drives PLL. LSE drives RTC.
+/**
+ * @brief   Use internal / external clocks.
+ * @details Configure HSI to drives PLL and  LSE to drives RTC.
+ *
+ * @return  None.
  */
 void i2_hsi_lse_clock_config(void)
 {
@@ -205,4 +231,4 @@ void i2_hsi_lse_clock_config(void)
   common_clock_config();
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_stm32f4xx_hal_rtc.c
+ * @brief       RTC set-up and control.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,45 +34,71 @@
 #include "i2_stm32f4xx_hal_clock.h"
 
 /* Private macro -------------------------------------------------------------*/
-#define RTC_ASYNCH_PREDIV               ( 0x7F )
-#define RTC_SYNCH_PREDIV                ( 0xF9 )     /* (32Khz / 128) - 1 */
-#define RTC_ALARM_A_STATUS_REG          ( RTC_BKP_DR0 )
-#define RTC_ALARM_B_STATUS_REG          ( RTC_BKP_DR1 )
-#define RTC_WAKEUP_CLK_SRC_REG          ( RTC_BKP_DR2 )
-#define RTC_PREEMPTION_PRIORITY         ( 5 )
-#define RTC_SUB_PRIORITY                ( 1 )
+#define RTC_ASYNCH_PREDIV         ( 0x7F )    /**< RTC async pre devision     */
+#define RTC_SYNCH_PREDIV          ( 0xF9 )    /**< RTC sync (32Khz / 128) - 1 */
+#define RTC_ALARM_A_STATUS_REG    ( RTC_BKP_DR0 ) /**< Alarm 1 Status Register*/
+#define RTC_ALARM_B_STATUS_REG    ( RTC_BKP_DR1 ) /**< Alarm 2 Status Register*/
+#define RTC_WAKEUP_CLK_SRC_REG    ( RTC_BKP_DR2 ) /**< Wakeup clock source Reg*/
+#define RTC_PREEMPTION_PRIORITY   ( 5 )           /**< RTC Preemption priority*/
+#define RTC_SUB_PRIORITY          ( 1 )           /**< RTC Sub priority       */
 
 /* Private variables ---------------------------------------------------------*/
-/* This defines the attributes of RTC hardware context. */
+/**
+ * @defgroup rtc_ctx RTC peripheral context.
+ * This defines the attributes of RTC hardware context.
+ *
+ * @{
+ */
+/** @brief RTC context */
 typedef struct {
-  const char *controller_name;
-  bool initialized;
-  RTC_TypeDef *baseaddr;
-  RTC_HandleTypeDef rtc;
-  i2_handler_t alarm[MAX_NUM_RTC_ALARMS];
-  i2_handler_t wakeup;
+  const char *controller_name;              /**< RTC controller name          */
+  bool initialized;                         /**< RTC initialization flag      */
+  RTC_TypeDef *baseaddr;                    /**< RTC peripheral base address  */
+  RTC_HandleTypeDef rtc;                    /**< RTC Handle                   */
+  i2_handler_t alarm[MAX_NUM_RTC_ALARMS];   /**< RTC Alarms table             */
+  i2_handler_t wakeup;                      /**< RTC Wake up handle           */
 #if defined ( ENABLE_RTOS_AWARE_HAL )
-  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t mutex;                  /**< RTC MUTEX protection         */
 #endif
-} rtc_ctx;
+} rtc_ctx;                                  /**< RTC Context                  */
+/** @} */ /* rtc_ctx */
 
+/** @brief RTC Context used in application */
 static rtc_ctx ctx = {
   "RTC", false, RTC,
 };
 
+/** @brief RTC HAL Handle */
 static RTC_HandleTypeDef *rtc = NULL;
 
 /* Private functions ---------------------------------------------------------*/
+/**
+ * @brief   Set alarm status.
+ * @details Set status of required RTC Alarm.
+ *
+ * @param[in] *handle     RTC Handle.
+ * @param[in] *alarm_id   RTC alarm instance to update.
+ * @param[in] *alarm      Alarm status to set.
+ * @return  None.
+ */
 static void rtc_alarm_status_set(RTC_HandleTypeDef *handle,
-                                  rtc_alarm_t alarm_id, bool arm)
+                                  rtc_alarm_t alarm_id, bool alarm)
 {
   if (alarm_id == RTC_ALARM_1) {
-    HAL_RTCEx_BKUPWrite(handle, RTC_ALARM_A_STATUS_REG, arm);
+    HAL_RTCEx_BKUPWrite(handle, RTC_ALARM_A_STATUS_REG, alarm);
   } else if (alarm_id == RTC_ALARM_2) {
-    HAL_RTCEx_BKUPWrite(handle, RTC_ALARM_B_STATUS_REG, arm);
+    HAL_RTCEx_BKUPWrite(handle, RTC_ALARM_B_STATUS_REG, alarm);
   }
 }
 
+/**
+ * @brief   Set alarm status.
+ * @details Set status of required RTC Alarm.
+ *
+ * @param[in] *handle       RTC Handle.
+ * @param[in] *alarm_id     RTC alarm instance to read.
+ * @return  Status of alarm setup.
+ */
 static bool rtc_alarm_status_get(RTC_HandleTypeDef *handle, rtc_alarm_t alarm_id)
 {
   uint32_t val = 0;
@@ -81,6 +112,12 @@ static bool rtc_alarm_status_get(RTC_HandleTypeDef *handle, rtc_alarm_t alarm_id
 }
 
 /* Public functions --------------------------------------------------------- */
+/**
+ * @brief   RTC initialization.
+ * @details Initialize RTC peripherals and respective clocks.
+ *
+ * @return  None.
+ */
 i2_error i2_rtc_init(void)
 {
   i2_error retval = I2_SUCCESS;
@@ -164,6 +201,13 @@ i2_error i2_rtc_init(void)
   return retval;
 }
 
+/**
+ * @brief   Get RTC time.
+ * @details Read RTC time.
+ *
+ * @param[out] *time    Time structure updated with current time.
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_time_get(struct tm *time)
 {
   i2_error retval = I2_SUCCESS;
@@ -217,6 +261,13 @@ err:
   return retval;
 }
 
+/**
+ * @brief   Set RTC time.
+ * @details Writes RTC time.
+ *
+ * @param[in] *time  Time structure to update.
+ * @return   Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_time_set(struct tm *time)
 {
   i2_error retval = I2_SUCCESS;
@@ -274,6 +325,18 @@ err:
   return retval;
 }
 
+/**
+ * @brief   Get RTC alarm.
+ * @details Read alarm time and repetition settings.
+ *
+ * @param[in]  *alarm_id    Alarm ID to read.
+ * @param[out] *alarm_type  Gets updated with alarm type @ref rtc_alarm_type_t.
+ * @param[out] *alarm       Gets updated with time setting for alarm.
+ * @return      Error code @ref I2_ERROR.
+ *
+ * @note    If the given alarm ID is not armed, the alarm_type will be set
+ *          to RTC_ALARM_TYPE_NONE and the alarm data meaningless.
+ */
 i2_error i2_rtc_alarm_get(rtc_alarm_t alarm_id, rtc_alarm_type_t *alarm_type,
                           struct tm *alarm)
 {
@@ -339,6 +402,18 @@ out:
   return retval;
 }
 
+/**
+ * @brief   Set RTC alarm.
+ * @details Configure alarm with time and repetition settings.
+ *
+ * @param[in] alarm_id      Alarm ID to read.
+ * @param[in] alarm_type    Alarm type to update @ref rtc_alarm_type_t.
+ * @param[in] *alarm        Time setting for alarm to update.
+ * @return  Error code @ref I2_ERROR.
+ *
+ * @note    If the given alarm_id is already set/armed, it will overwrite
+ *          the existing alarm setting without any error.
+ */
 i2_error i2_rtc_alarm_set(rtc_alarm_t alarm_id, rtc_alarm_type_t alarm_type,
                            struct tm *alarm)
 {
@@ -415,6 +490,17 @@ out:
   return retval;
 }
 
+/**
+ * @brief   Delete a RTC alarm.
+ * @details Deactives an alarm.
+ *
+ * @param[in] alarm_id      ID of alarm to disable.
+ * @return  Error code @ref I2_ERROR.
+ *
+ * @note    This disables the alarm interrupt but the associated callback
+ *          stays, if it exists. To re-enable the alarm, please use
+ *          rtc_alarm_set() to set it again to new value.
+ */
 i2_error i2_rtc_alarm_delete(rtc_alarm_t alarm_id)
 {
   i2_error retval = I2_SUCCESS;
@@ -455,19 +541,13 @@ i2_error i2_rtc_alarm_delete(rtc_alarm_t alarm_id)
   return retval;
 }
 
-/*
- * @brief  Set periodical wake up timer
- * @param  period: Wake up counter
- * @param  clock_source: Wake up clock
+/**
+ * @brief   Set periodical wake up timer.
+ * @details It can be used to do some periodic task when system is put to sleep.
  *
- *  clock source can be any one of the following value.
- *  RTC_WAKEUPCLOCK_RTCCLK_DIV16
- *  RTC_WAKEUPCLOCK_RTCCLK_DIV8
- *  RTC_WAKEUPCLOCK_RTCCLK_DIV4
- *  RTC_WAKEUPCLOCK_RTCCLK_DIV2
- *  RTC_WAKEUPCLOCK_CK_SPRE_16BITS  : clock 1Hz
- *  RTC_WAKEUPCLOCK_CK_SPRE_17BITS
-*/
+ * @param[in] period        Wake up counter.
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_wakeup_set(uint32_t period)
 {
   i2_error retval = I2_SUCCESS;
@@ -507,6 +587,13 @@ i2_error i2_rtc_wakeup_set(uint32_t period)
   return retval;
 }
 
+/**
+ * @brief   Get periodical wake up timer.
+ * @details It can be used to do some periodic task when system is put to sleep.
+ *
+ * @param[out] *period       Wake up counter.
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_wakeup_get(uint32_t *period)
 {
   RTC_HandleTypeDef *handle;
@@ -537,6 +624,12 @@ i2_error i2_rtc_wakeup_get(uint32_t *period)
   return retval;
 }
 
+/**
+ * @brief   Disable wake up timer.
+ * @details Deletes settings for wake up timer.
+ *
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_wakeup_delete(void)
 {
   i2_error retval = I2_SUCCESS;
@@ -564,6 +657,19 @@ i2_error i2_rtc_wakeup_delete(void)
   return retval;
 }
 
+/**
+ * @brief   Register wake up handler callback.
+ * @details A callback along with respective arguments can be registered.
+ *
+ * @param[in] *cb      Callback to register.
+ * @param[in] *arg     Arguments to pass with callback.
+ * @return   Error code @ref I2_ERROR.
+ *
+ * @note    Note the callback runs in the rtc interrupt context. Thus, if the
+ *          callback requires a heavy processing, sleep, delay, or mutex or
+ *          semaphore, please have the callback simply signal a task to perform
+ *          the lower half work.
+ */
 i2_error i2_rtc_wakeup_handler_register(void (*cb)(void *arg), void *arg)
 {
   i2_error retval = I2_SUCCESS;
@@ -586,6 +692,12 @@ i2_error i2_rtc_wakeup_handler_register(void (*cb)(void *arg), void *arg)
   return retval;
 }
 
+/**
+ * @brief   Unregister wake up handler callback.
+ * @details Removes registered wake up handler callback.
+ *
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_wakeup_handler_unregister(void)
 {
   if ( !ctx.initialized ) {
@@ -606,6 +718,15 @@ i2_error i2_rtc_wakeup_handler_unregister(void)
   return I2_SUCCESS;
 }
 
+/**
+ * @brief   Register RTC alarm handler callback.
+ * @details A callback along with respective arguments can be registered.
+ *
+ * @param[in] alarm_id    Alarm ID for which setting handler callback.
+ * @param[in] *cb         Callback to register.
+ * @param[in] *arg        Arguments to pass with callback.
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_alarm_handler_register(rtc_alarm_t alarm_id,
                                        void (*cb)(void *arg), void *arg)
 {
@@ -640,6 +761,13 @@ out:
   return retval;
 }
 
+/**
+ * @brief   Unregister RTC alarm handler callback.
+ * @details Removes registered alarm handler callback.
+ *
+ * @param[in] alarm_id      Alarm ID for alarm to deregister.
+ * @return  Error code @ref I2_ERROR.
+ */
 i2_error i2_rtc_alarm_handler_unregister(rtc_alarm_t alarm_id)
 {
   if ( !ctx.initialized ) {
@@ -664,12 +792,24 @@ i2_error i2_rtc_alarm_handler_unregister(rtc_alarm_t alarm_id)
   return I2_SUCCESS;
 }
 
-/* This handles both alarm callbacks */
+/**
+ * @brief   RTC alarm callback.
+ * @details This handles both alarm callback.
+ *
+ * @return None.
+ */
 void RTC_Alarm_IRQHandler(void)
 {
   HAL_RTC_AlarmIRQHandler(rtc);
 }
 
+/**
+ * @brief   RTC Alarm A event callback.
+ * @details This handles events for alarm A.
+ *
+ * @param[in] handle      RTC handle instance.
+ * @return  None.
+ */
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *handle)
 {
 #if defined ( ENABLE_RTOS_AWARE_HAL )
@@ -686,6 +826,13 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *handle)
   }
 }
 
+/**
+ * @brief   RTC Alarm B event callback.
+ * @details This handles events for alarm B.
+ *
+ * @param[in] handle      RTC handle instance.
+ * @return  None.
+ */
 void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *handle)
 {
 #if defined ( ENABLE_RTOS_AWARE_HAL )
@@ -702,11 +849,24 @@ void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *handle)
   }
 }
 
+/**
+ * @brief   RTC wake up interrupt handler.
+ * @details This handles RTC wake up interrupts.
+ *
+ * @return  None.
+ */
 void RTC_WKUP_IRQHandler(void)
 {
   HAL_RTCEx_WakeUpTimerIRQHandler(rtc);
 }
 
+/**
+ * @brief   RTC wake up event handler.
+ * @details This handles RTC wake up events.
+ *
+ * @param[in] handle      RTC handle instance.
+ * @return  None.
+ */
 void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *handle)
 {
 #if defined ( ENABLE_RTOS_AWARE_HAL )
@@ -723,4 +883,4 @@ void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *handle)
   }
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

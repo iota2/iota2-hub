@@ -4,14 +4,23 @@
 
 <i2.iotasquare@gmail.com>
 
+```
+ ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ ██║██║   ██║   ██║   ███████║ █████╔╝
+ ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+```
+
 [![BSD licensed](https://img.shields.io/badge/license-GPL3-blue.svg)](https://raw.githubusercontent.com/iota2/iota2-hub/develop/LICENSE)
 [![Build Status](https://travis-ci.org/iota2/iota2-hub.svg?branch=develop)](https://travis-ci.org/iota2/iota2-hub)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub?ref=badge_shield)
 [![Coverage Status](https://coveralls.io/repos/github/iota2/iota2-hub/badge.svg?branch=develop)](https://coveralls.io/github/iota2/iota2-hub?branch=develop)
 
 ## IOTA2-HUB
-IOTA2-HUB is an Ethernet connectivity module that is able to 
-monitorvarious components and provides multiple options to 
+IOTA2-HUB is an Ethernet connectivity module that is able to
+monitorvarious components and provides multiple options to
 connect over a number of internet protocols
 
 ## System Configurations
@@ -36,4 +45,3 @@ connect over a number of internet protocols
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fiota2%2Fiota2-hub?ref=badge_large)
 
 **Free Software, Hell Yeah!**
-

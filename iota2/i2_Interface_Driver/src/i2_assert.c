@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_assert.c
+ * @brief       System assert functionality.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,11 +39,17 @@
 #include <semphr.h>
 #endif
 
-static void assert_flash_led(void)
+/**
+ * @brief    Function to call when a system assert call happens.
+ * @details  Here write the operations when assert happens.
+ *
+ * @return   None.
+ */
+static void assert(void)
 {
   while (1) {
     /*
-     * If error, toggle both LEDs fast.
+     * If error, toggle both LED's fast.
      * The i value was experimentally determined
      * based on the current 80Mhz core clock.
      */
@@ -55,12 +66,19 @@ static void assert_flash_led(void)
   }
 }
 
+/**
+ * @brief   Assert check utility.
+ * @details Call this utility when needs to check asset functionality.
+ *
+ * @param[in] good : parameter to check.
+ * @return  None.
+ */
 void i2_assert(int32_t good)
 {
   if (!good) {
     portDISABLE_INTERRUPTS();
-    assert_flash_led();
+    assert();
   }
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

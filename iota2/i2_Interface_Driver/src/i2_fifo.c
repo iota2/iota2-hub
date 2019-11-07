@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_fifo.c
+ * @brief       FIFO buffer implementation.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,6 +41,15 @@
 #endif
 
 /* Public functions --------------------------------------------------------- */
+/**
+ * @brief   Initializes FIFO context.
+ * @details Initialize all components for FIFO contexts.
+ *
+ * @param[in] fifo        FIFO context to initialize @ref i2_fifo_t.
+ * @param[in] buf         Buffer to allocation to FIFO context.
+ * @param[in] fifo_size   Size of FIFO.
+ * @return  None.
+ */
 void i2_fifo_init(i2_fifo_t *fifo, uint8_t *buf, int32_t fifo_size)
 {
   i2_fifo_reset(fifo);
@@ -44,22 +58,44 @@ void i2_fifo_init(i2_fifo_t *fifo, uint8_t *buf, int32_t fifo_size)
   memset(buf, 0, fifo_size);
 }
 
+/**
+ * @brief   Reset FIFO context.
+ * @details Reset read and write indexes of FIFO.
+ *
+ * @param[in] fifo    FIFO context to reset @ref i2_fifo_t.
+ * @return  None.
+ */
 void i2_fifo_reset(i2_fifo_t *fifo)
 {
   fifo->wr_index = fifo->rd_index = 0;
 }
 
+/**
+ * @brief   Get size of FIFO context.
+ * @details This function will return FIFO size @ref i2_fifo_t.
+ *
+ * @param[in] fifo    FIFO context @ref i2_fifo_t.
+ * @return  Size of FIFO context.
+ */
 int32_t i2_fifo_size(i2_fifo_t *fifo)
 {
   return fifo->fifo_size;
 }
 
+/**
+ * @brief   Get count of FIFO buffer.
+ * @details Returns the difference between write and read buffer.
+ *
+ * @param[in] fifo      FIFO context @ref i2_fifo_t.
+ * @param[in] in_isr    Is this function is called from an ISR or not.
+ * @return  The difference between size of write and read buffers.
+ */
 int32_t i2_fifo_count(i2_fifo_t *fifo, bool in_isr)
 {
   int32_t count;
 
 #if defined ( ENABLE_RTOS_AWARE_HAL )
-  if ( !in_isr ) {
+  if (!in_isr) {
     vPortEnterCritical();
   }
 #else
@@ -67,17 +103,17 @@ int32_t i2_fifo_count(i2_fifo_t *fifo, bool in_isr)
 #endif
 
   count = fifo->wr_index - fifo->rd_index;
-  if ( count < 0 ) {
+  if (count < 0) {
     count += fifo->fifo_size;
   }
 
-  if ( count < fifo->fifo_size ) {
+  if (count < fifo->fifo_size) {
     fifo->wr_index %= fifo->fifo_size;
     fifo->rd_index %= fifo->fifo_size;
   }
 
 #if defined ( ENABLE_RTOS_AWARE_HAL )
-  if ( !in_isr ) {
+  if (!in_isr) {
     vPortExitCritical();
   }
 #endif
@@ -85,11 +121,20 @@ int32_t i2_fifo_count(i2_fifo_t *fifo, bool in_isr)
   return count;
 }
 
+/**
+ * @brief   Write data to FIFO buffer.
+ * @details Write data to FIFO.
+ *
+ * @param[in] fifo      FIFO context to write @ref i2_fifo_t.
+ * @param[in] data      Data to write on FIFO.
+ * @param[in] in_isr    Is this function is called from an ISR or not.
+ * @return  If Success returns FIFO count else ( -1 ) when error occurred.
+ */
 int32_t i2_fifo_write(i2_fifo_t *fifo, uint8_t data, bool in_isr)
 {
   int32_t retval = 0;
 
-  if ( i2_fifo_count(fifo, in_isr) < fifo->fifo_size ) {
+  if (i2_fifo_count(fifo, in_isr) < fifo->fifo_size) {
     fifo->buf[fifo->wr_index % fifo->fifo_size] = data;
     fifo->wr_index++;
     retval = i2_fifo_count(fifo, in_isr);
@@ -101,6 +146,15 @@ int32_t i2_fifo_write(i2_fifo_t *fifo, uint8_t data, bool in_isr)
   return retval;
 }
 
+/**
+ * @brief   Read data from FIFO buffer.
+ * @details Read data from FIFO.
+ *
+ * @param[in] fifo      FIFO context to read @ref i2_fifo_t.
+ * @param[in] *data     Data read from FIFO.
+ * @param[in] in_isr    Is this function is called from an ISR or not.
+ * @return  If Success returns FIFO count else ( -1 ) when error occurred.
+ */
 int32_t i2_fifo_read(i2_fifo_t *fifo, uint8_t *data, bool in_isr)
 {
   int32_t retval = 0;
@@ -117,6 +171,17 @@ int32_t i2_fifo_read(i2_fifo_t *fifo, uint8_t *data, bool in_isr)
   return retval;
 }
 
+/**
+ * @brief   Read a buffer from FIFO.
+ * @details Reads specified bytes count from FIFO and & copy it to destination.
+ *
+ * @param[in]     fifo      FIFO context to read @ref i2_fifo_t.
+ * @param[in]     dst       Destination to copy buffer.
+ * @param[in,out] size      Size to read form buffer.
+ *                          Updated size of bytes read from FIFO is returned.
+ * @param[in]     in_isr    Is this function is called from an ISR or not.
+ * @return  None.
+ */
 void i2_fifo_copy(i2_fifo_t *fifo, uint8_t *dst, int32_t *size, bool in_isr)
 {
   uint8_t data;
@@ -132,4 +197,4 @@ void i2_fifo_copy(i2_fifo_t *fifo, uint8_t *dst, int32_t *size, bool in_isr)
   return;
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

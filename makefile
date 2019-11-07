@@ -1,15 +1,19 @@
 #
-# @author       iota square <i2>
+# @author       iota square [i2]
+# <pre>
+# ██╗ ██████╗ ████████╗ █████╗ ██████╗
+# ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+# ██║██║   ██║   ██║   ███████║ █████╔╝
+# ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+# ██║╚██████╔╝   ██║   ██║  ██║███████╗
+# ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+# </pre>
+#
 # @date         07-09-2019
 # @file         makefile
-#  _       _        ___  
-# (_)     | |      |__ \.
-#  _  ___ | |_ __ _   ) |
-# | |/ _ \| __/ _` | / / 
-# | | (_) | || (_| |/ /_ 
-# |_|\___/ \__\__,_|____|
+# @brief       	Makefile for IOTA2 HUB application.
 #
-# @License      GNU GPU v3
+# @copyright    GNU GPU v3
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,10 +28,10 @@
 # Free Software, Hell Yeah!
 #
 
-NAME           := IOTA2_HUB
+NAME               := IOTA2_HUB
 
-GLOBAL_DEFINES := $(NAME)
-GLOBAL_DEFINES += STM32F40XX
+GLOBAL_DEFINES     := $(NAME)
+GLOBAL_DEFINES     += STM32F40XX
 export GLOBAL_DEFINES
 
 TOOLS_ROOT         := $(CURDIR)/tools
@@ -49,6 +53,9 @@ GLOBAL_DEFINES += VERBOSE_LEVEL=0
 .SILENT:
 endif
 
+# ------------------------------------------------------------------------------
+# Compiler Paths
+# ------------------------------------------------------------------------------
 export CC      := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gcc
 export CCDEP   := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gcc
 export LD      := $(TOOLCHAIN_PATH)$(TOOLCHAIN_PREFIX)gcc
@@ -67,7 +74,9 @@ else
 OUTPUT      = $(OUTPUT_ROOT)/$(NAME)/debug
 endif
 
-# Executables ------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Executables
+# ------------------------------------------------------------------------------
 ELF         = $(OUTPUT)/$(NAME).elf
 BIN         = $(OUTPUT)/$(NAME).bin
 HEX         = $(OUTPUT)/$(NAME).hex
@@ -78,8 +87,10 @@ COV         = $(OUTPUT)/GCOV/
 GIT_HASH   := $(shell git describe --dirty --always --abbrev=0)
 
 CPU         = -mthumb -mcpu=cortex-m4 -mfloat-abi=hard
-STM32_OPT   = -DSTM32F407xx -DSTM32F407xx -DENABLE_RTOS_AWARE_HAL -DUSE_FULL_ASSERT -DENABLE_ASSERT
-OTHER_OPT   = "-D__weak=__attribute__((weak))" "-D__packed=__attribute__((__packed__))"
+STM32_OPT   = -DSTM32F407xx -DSTM32F407xx -DENABLE_RTOS_AWARE_HAL
+STM32_OPT  += -DUSE_FULL_ASSERT -DENABLE_ASSERT
+OTHER_OPT   = "-D__weak=__attribute__((weak))"
+OTHER_OPT  += "-D__packed=__attribute__((__packed__))"
 LDSCRIPT    = ./STM32F407IGTx_FLASH.ld
 
 DRV_DIR    := ./drivers
@@ -111,32 +122,31 @@ ARFLAGS     = cr
 OBJFLAGS_C  = -Obinary
 OBJFLAGS_D  = -S
 
-# -------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Build Type Modifiers
-# -------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ifeq ($(RELEASE), yes)
 CFLAGS 	   += -Os
 LDFLAGS    += --specs=nosys.specs
 else
-STM32_OPT  += -DENABLE_DEBUG
+xSTM32_OPT += -DENABLE_DEBUG
 CFLAGS 	   += -ggdb -g3 -Og
 LDFLAGS    += --specs=rdimon.specs -Og
 endif
 
-# -------------------------------------------------------------
+export CFLAGS
+export ARFLAGS
+
+# ------------------------------------------------------------------------------
 # Code Coverage Computation
 #   Adding -coverage to both CFLAGS and LDFLAGS
 #   - This will enable both -fprofile-arcs and -ftest-coverage flags
-# -------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ifeq ($(CODE_COV), yes)
-CFLAGS     += -coverage
-LDFLAGS    += -coverage
+COVERAGE   += -coverage
 GCOV_PREFIX = $(COV)
 GCOV_PREFIX_STRIP = 1
 endif
-
-export CFLAGS
-export ARFLAGS
 
 VPATH       = app/src:
 VPATH      += iota2/i2_Interface_Driver/src:
@@ -144,9 +154,11 @@ VPATH      += iota2/i2_STM32F4xx_HAL_Driver/src:
 VPATH      += $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates:
 VPATH      += $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc:
 
-ASMS        = $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f407xx.s
+ASMS        = $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/ \
+              Templates/gcc/startup_stm32f407xx.s
 
-SRCS        = $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c
+SRCS        = $(DRV_DIR)/CMSIS/Device/ST/STM32F4xx/Source/ \
+              Templates/system_stm32f4xx.c
 SRCS       += app/src/main.c
 SRCS       += app/src/stm32f4xx_it.c
 SRCS       += iota2/i2_STM32F4xx_HAL_Driver/i2_assert.c
@@ -188,6 +200,11 @@ erase:
 	st-flash erase
 
 $(OUTPUT):
+ifeq ($(RELEASE), yes)
+	@echo "Initiating RELEASE build..."
+else
+	@echo "Initiating DEBUG build..."
+endif
 	mkdir -p $(OUTPUT)
 	mkdir -p $(COV)
 
@@ -224,18 +241,18 @@ clean:
 	rm -fr $(OUTPUT_ROOT)
 	@$(MAKE) -C $(DRV_DIR) clean
 	@$(MAKE) -C $(MDL_DIR) clean
-	
+
 $(OUTPUT_ROOT)/%.o: %.c
 ifeq ($(VERBOSE_LEVEL),1)
 	@echo cc $<
 endif
-	@$(CC) $(CFLAGS) -c $< -o $@ -MMD -MF $(@:.o=.d)
+	@$(CC) $(CFLAGS) $(COVERAGE) -c $< -o $@ -MMD -MF $(@:.o=.d)
 
 $(OUTPUT_ROOT)/%.o: %.s
 ifeq ($(VERBOSE_LEVEL),1)
 	@echo as $<
 endif
-	@$(AS) $(ASFLAGS) -c -o $@ $<
+	@$(AS) $(ASFLAGS) $(COVERAGE) -c -o $@ $<
 
 get_code_cov:
 	@echo "#################################"
@@ -277,7 +294,7 @@ help:
 	@echo "[clean]         Clean complete project"
 	@echo "[libclean]      Clean all libraries"
 	@echo "[test]          Test complete project by test making all targets"
-	@echo "[gcc_path]      Display all configured GCC paths"	
+	@echo "[gcc_path]      Display all configured GCC paths"
 	@echo "[flash]         Flash build to target"
 	@echo "[erase]         Erase target"
 	@echo "[get_code_cov]  Compute code coverage reports"
@@ -292,5 +309,4 @@ help:
 	@echo "[CODE_COV]"
 	@echo "   yes : Compile with code coverage flags"
 
-# *********************** (C) COPYRIGHT iota2 ************END OF FILE**********
-
+# *********************** (C) COPYRIGHT iota2 ***[i2]******END OF FILE**********

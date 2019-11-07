@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_stm32f4xx_hal_rtc.h
+ * @brief       RTC set-up and control.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,62 +41,53 @@
 #endif
 
 /* Exported constants --------------------------------------------------------*/
-/* Two alarm instance IDs */
+/**
+ * @defgroup rtc_alarm_t RTC Alarm instances.
+ * Two alarm instance IDs.
+ *
+ * @{
+ */
+/** @brief RTC available alarms */
 typedef enum {
-  RTC_ALARM_1 = 0,
-  RTC_ALARM_2,
-  MAX_NUM_RTC_ALARMS,
-} rtc_alarm_t;
+  RTC_ALARM_1 = 0,          /**< RTC Alarm 1                    */
+  RTC_ALARM_2,              /**< RTC Alarm 2                    */
+  MAX_NUM_RTC_ALARMS,       /**< Maximum RTC Alarm counts       */
+} rtc_alarm_t;              /**< RTC Alarm instance             */
+/** @} */ /* rtc_alarm_t */
 
-/*
+/**
+ * @defgroup rtc_alarm_type_t RTC Alarm type.
  * An RTC alarm can either trigger off date of each month
  * or weekday of each week. The alarm can't be set with
  * year or month fields.
+ *
+ * @{
  */
+/** @brief RTC alarms options */
 typedef enum {
-  RTC_ALARM_TYPE_NONE = 0,
-  RTC_ALARM_TYPE_WEEKDAY,
-  RTC_ALARM_TYPE_DATE,
-  MAX_NUM_RTC_ALARM_TYPES,
-} rtc_alarm_type_t;
+  RTC_ALARM_TYPE_NONE = 0,  /**< Alarm type not configured      */
+  RTC_ALARM_TYPE_WEEKDAY,   /**< Alarm set for weekday          */
+  RTC_ALARM_TYPE_DATE,      /**< Alarm set for days of month    */
+  MAX_NUM_RTC_ALARM_TYPES,  /**< Maximum number of alarm types  */
+} rtc_alarm_type_t;         /**< RTC Alarm type                 */
+/** @} */ /* rtc_alarm_type_t */
 
+/* Public functions --------------------------------------------------------- */
 i2_error i2_rtc_init(void);
 i2_error i2_rtc_time_get(struct tm *time);
 i2_error i2_rtc_time_set(struct tm *time);
-
-/*
- * If the given alarm ID is not armed, the alarm_type will be
- * set to RTC_ALARM_TYPE_NONE and the alarm data meaningless.
- */
 i2_error i2_rtc_alarm_get(rtc_alarm_t alarm_id,
                           rtc_alarm_type_t *alarm_type, struct tm *alarm);
-/*
- * If the given alarm_id is already set/armed, it will overwrite the existing
- * alarm setting without any error.
- */
 i2_error i2_rtc_alarm_set(rtc_alarm_t alarm_id,
                           rtc_alarm_type_t alarm_type, struct tm *alarm);
-
-/*
- * This disables the alarm interrupt but the associated callback stays, if it exists.
- * To re-enable the alarm, please use rtc_alarm_set() to set it again to new value.
- */
 i2_error i2_rtc_alarm_delete(rtc_alarm_t alarm_id);
-
 i2_error i2_rtc_wakeup_set(uint32_t period);
 i2_error i2_rtc_wakeup_get(uint32_t *period);
 i2_error i2_rtc_wakeup_delete(void);
-
-/*
- * Note the callback runs in the rtc interrupt context. Thus, if the callback
- * requires a heavy processing, sleep, delay, or mutex/semaphore, please have
- * the callback simply signal a task to perform the lower half work.
- */
 i2_error i2_rtc_alarm_handler_register(rtc_alarm_t alarm_id,
                                        void (*cb)(void *arg), void *arg);
 i2_error i2_rtc_alarm_handler_unregister(rtc_alarm_t alarm_id);
-
 i2_error i2_rtc_wakeup_handler_register(void (*cb)(void *arg), void *arg);
 i2_error i2_rtc_wakeup_handler_unregister(void);
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

@@ -42,7 +42,7 @@ tags
 *.gcov
 
 # Project #
-.cproject
+# .cproject  # Added .cproject to repo for make and other predefined configurations
 .project
 .mxproject
 .settings/

@@ -1,0 +1,27 @@
+var group__SSD1306__CONFIG__SPEC =
+[
+    [ "SSD1306_CHARGE_PUMP_DISABLE", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gafebca9315a1eb9f6b41f6a43b7db0106", null ],
+    [ "SSD1306_CHARGE_PUMP_ENABLE", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gaa21cc1b56c2f06134b4f89cc5ae72aef", null ],
+    [ "SSD1306_COM_PINS_ALT", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gaf08f5749a22d8aee58bf0afdb908c8cd", null ],
+    [ "SSD1306_COM_PINS_DISABLE_REMAP", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga3e2b9ad65a0f74c3085dfb16044dc6f9", null ],
+    [ "SSD1306_COM_PINS_ENABLE_REMAP", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gae297bab6f0b7d9383f3610ebf353df94", null ],
+    [ "SSD1306_COM_PINS_SEQ", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga9864f93fa0c3539dabcf1c4f517a2b1e", null ],
+    [ "SSD1306_CUSTOM_FREQ", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gaa4f6ca0ed9111f6f3a6419e7483e40c8", null ],
+    [ "SSD1306_DEFAULT_FREQ", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gab44bf75035c5a4178db3582c40d0e23d", null ],
+    [ "SSD1306_EXTERNAL_VCC_CONTRAST", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga82b0007ca3fb56df33ce802984167c94", null ],
+    [ "SSD1306_HORIZONTAL_ADDRESSING_MODE", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga7bbd4ddf82bb98b0c56c3fba0a26376b", null ],
+    [ "SSD1306_LINE_0", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gae1958d2007f806338a6fe03e0948dff5", null ],
+    [ "SSD1306_OFFSET_NULL", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gabe37a9b2ce74a6275b4e4f7122337475", null ],
+    [ "SSD1306_PRECHARGE_PHASE1_CUSTOM", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gabd2985e975596acf921df00acd4391e9", null ],
+    [ "SSD1306_PRECHARGE_PHASE1_DEFAULT", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gadab820211f09573bd5791802192e789e", null ],
+    [ "SSD1306_PRECHARGE_PHASE2_CUSTOM", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga02cc7541b8bd2e48da1cf8aef8db5ec3", null ],
+    [ "SSD1306_PRECHARGE_PHASE2_DEFAULT", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gae5ef28b71dea93197a6156230f8ecd4a", null ],
+    [ "SSD1306_SEGMENT_REMAP_COL_0", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gac7b8b9a9975af57d4a6a3dcfc6a11f10", null ],
+    [ "SSD1306_SEGMENT_REMAP_COL_127", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga5c8530438d31ba8a2873d943789bd96b", null ],
+    [ "SSD1306_SWITCH_CAP_VCC_CONTRAST", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gaf5ad62b24a0e50a525faf44182fce537", null ],
+    [ "SSD1306_VCOM_0_65xVCC", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga4ca371ac44c68fd0fdd8a5c7647389c1", null ],
+    [ "SSD1306_VCOM_0_77xVCC", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gab2429e8c1c1361e3d66b9fd496e5dce9", null ],
+    [ "SSD1306_VCOM_0_83xVCC", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gacbe4fda1f5819417d297330f345ec72b", null ],
+    [ "SSD1306_VCOM_DEFAULT", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#gabefcddc26e288e1856f7b773e8b1ec40", null ],
+    [ "SSD1306_VERTICAL_ADDRESSING_MODE", "d6/dd6/group__SSD1306__CONFIG__SPEC.html#ga90823bc6487c3e2275c7cd2962f6f13c", null ]
+];

@@ -1,27 +1,25 @@
 /**
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
+ *
  * @date        07-09-2019
- * @author      iota square <i2>
- *  _       _        ___  
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / / 
- * | | (_) | || (_| |/ /_ 
- * |_|\___/ \__\__,_|____|
- *
- *
- * @File        LinkerScript.ld
+ * @file        STM32F407IGTx_FLASH.ld
+ * @brief       IOTA2 HUB linker file.
  *
  * @Abstract    Linker script for STM32F407IGTx Device with
  *              512KByte FLASH, 192KByte RAM
- *
  *              Set heap size, stack size and stack location according
  *              to application requirements.
- *
  *              Set memory bank area and size if external memory is used.
  *
- * @Target      STMicroelectronics STM32
- *
- * @License     GNU GPU v3
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -123,7 +121,7 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
-  .data : 
+  .data :
   {
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
@@ -136,11 +134,11 @@ SECTIONS
 
   _siccmram = LOADADDR(.ccmram);
 
-  /* CCM-RAM section 
-  * 
-  * IMPORTANT NOTE! 
+  /* CCM-RAM section
+  *
+  * IMPORTANT NOTE!
   * If initialized variables will be placed in this section,
-  * the startup code needs to be modified to copy the init-values.  
+  * the startup code needs to be modified to copy the init-values.
   */
   .ccmram :
   {
@@ -148,12 +146,12 @@ SECTIONS
     _sccmram = .;       /* create a global symbol at ccmram start */
     *(.ccmram)
     *(.ccmram*)
-    
+
     . = ALIGN(4);
     _eccmram = .;       /* create a global symbol at ccmram end */
   } >CCMRAM AT> FLASH
 
-  
+
   /* Uninitialized data section */
   . = ALIGN(4);
   .bss :
@@ -181,7 +179,7 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  
+
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
@@ -194,5 +192,4 @@ SECTIONS
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
-
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

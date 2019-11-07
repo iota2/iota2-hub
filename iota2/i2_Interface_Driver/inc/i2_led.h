@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_led.h
+ * @brief       LED interface.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,11 +36,19 @@
 #include <stdbool.h>
 
 /* Public define -------------------------------------------------------------*/
+/**
+ * @defgroup i2_led_t LED used in system.
+ * Defines the LED's to use.
+ *
+ * @{
+ */
+/** @brief Defined LED's */
 typedef enum {
-  LED1 = 0,
-  LED2,
-  MAX_NUM_LEDS,
+  LED1 = 0,               /**< System LED 1         */
+  LED2,                   /**< System LED 2         */
+  MAX_NUM_LEDS,           /**< Maximum System LED's */
 } i2_led_t;
+/** @} */ /* i2_led_t */
 
 /* Public functions --------------------------------------------------------- */
 void i2_led_init(void);
@@ -43,4 +56,4 @@ void i2_led_on(i2_led_t led_idx);
 void i2_led_off(i2_led_t led_idx);
 void i2_led_toggle(i2_led_t led_idx);
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/

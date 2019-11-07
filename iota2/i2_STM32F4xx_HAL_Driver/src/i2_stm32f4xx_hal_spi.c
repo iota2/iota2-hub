@@ -1,14 +1,19 @@
 /**
- * @author      iota square <i2>
- * @date        16-09-2019
- *  _       _        ___
- * (_)     | |      |__ \.
- *  _  ___ | |_ __ _   ) |
- * | |/ _ \| __/ _` | / /
- * | | (_) | || (_| |/ /_
- * |_|\___/ \__\__,_|____|
+ * @author      iota square [i2]
+ * <pre>
+ * ██╗ ██████╗ ████████╗ █████╗ ██████╗
+ * ██║██╔═══██╗╚══██╔══╝██╔══██╗╚════██╗
+ * ██║██║   ██║   ██║   ███████║ █████╔╝
+ * ██║██║   ██║   ██║   ██╔══██║██╔═══╝
+ * ██║╚██████╔╝   ██║   ██║  ██║███████╗
+ * ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝
+ * </pre>
  *
- * @License     GNU GPU v3
+ * @date        16-09-2019
+ * @file        i2_stm32f4xx_hal_spi.c
+ * @brief       SPI set-up and control.
+ *
+ * @copyright   GNU GPU v3
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,159 +43,237 @@
 
 /* Private defines -----------------------------------------------------------*/
 /* Definition for SPI Priority */
-#define SPI_PREEMPTION_PRIORITY           ( 5 )
-#define SPI_SUB_PRIORITY                  ( 1 )
-#define SPI_DMA_PREEMPTION_PRIORITY       ( 5 )
-#define SPI_DMA_SUB_PRIORITY              ( 1 )
+#define SPI_PREEMPTION_PRIORITY       ( 5 ) /**< SPI preemption priority      */
+#define SPI_SUB_PRIORITY              ( 1 ) /**< SPI sub priority             */
+#define SPI_DMA_PREEMPTION_PRIORITY   ( 5 ) /**< SPI DMA preemption priority  */
+#define SPI_DMA_SUB_PRIORITY          ( 1 ) /**< SPI DMA sub priority         */
 
-/* iota2 SPI CONFIGURATION *****************************************************
+/**
+ * @defgroup I2_SPI_CONFIG SPI configurations.
+ * Defines available configurations for SPI peripheral  including GPIO and DMA.
+ *
+ * @{
+ *
+ *  | SPI     | PIN    | GPIO    | AF  | MODE  | DMA   | CHANNEL   | STREAM    |
+ *  |:-------:|:------:|:-------:|:---:|:-----:|:-----:|:---------:|:---------:|
+ *  | SPI1    | NSS    | PA4     | AF5 |       |       |           |           |
+ *  | ^       | ^      | PA15    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | SCLK   | PA5     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB3     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | MISO   | PA6     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB4     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | MOSI   | PA7     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB5     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       |        |         | ^   | RX    | DMA2  | CHANNEL3  | STREAM0   |
+ *  | ^       | ^      | ^       | ^   | ^     | ^     | ^         | STREAM2   |
+ *  | ^       |        |         | ^   | TX    | ^     | ^         | STREAM3   |
+ *  | ^       | ^      | ^       | ^   | ^     | ^     | ^         | STREAM4   |
+ *  | SPI2    | NSS    | PB9     | AF5 |       |       |           |           |
+ *  | ^       | ^      | PB12    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PI0     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | SCLK   | PB10    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB13    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PI1     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | MISO   | PC2     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB14    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PI2     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | MOSI   | PC3     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB15    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PI3     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       |        |         | ^   | RX    | DMA1  | CHANNEL0  | STREAM3   |
+ *  | ^       |        |         | ^   | TX    | ^     | ^         | STREAM4   |
+ *  | SPI3    | NSS    | PA4     | AF5 |       |       |           |           |
+ *  | ^       | ^      | PA15    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | SCLK   | PC10    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB3     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | MISO   | PC11    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB4     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | MOSI   | PC12    | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       | ^      | PB5     | ^   | ^     | ^     | ^         | ^         |
+ *  | ^       |        |         | ^   | RX    | DMA1  | CHANNEL0  | STREAM0   |
+ *  | ^       | ^      | ^       | ^   | ^     | ^     | ^         | STREAM2   |
+ *  | ^       |        |         | ^   | TX    | ^     | ^         | STREAM5   |
+ *  | ^       | ^      | ^       | ^   | ^     | ^     | ^         | STREAM7   |
+ */
+/** @} */ /* I2_SPI_CONFIG */
 
-  +=========+=======+=========+=====+=======+=======+===========+===========+
-  | SPI     | PIN   | GPIO    | AF  | MODE  | DMA   | CHANNEL   | STREAM    |
-  +=========+=======+=========+=====+=======+=======+===========+===========+
-  | SPI1    | NSS   | PA4     | AF5 |       |       |           |           |
-  |         |       | PA15    |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | SCLK  | PA5     |     |       |       |           |           |
-  |         |       | PB3     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | MISO  | PA6     |     |       |       |           |           |
-  |         |       | PB4     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | MOSI  | PA7     |     |       |       |           |           |
-  |         |       | PB5     |     |       |       |           |           |
-  |         +-------+---------+     +-------+-------+-----------+-----------+
-  |         |       |         |     | RX    | DMA2  | CHANNEL3  | STREAM0   |
-  |         |       |         |     |       |       |           | STREAM2   |
-  |         +-------+---------+     +-------+       |           +-----------+
-  |         |       |         |     | TX    |       |           | STREAM3   |
-  |         |       |         |     |       |       |           | STREAM4   |
-  +=========+=======+=========+=====+=======+=======+===========+===========+
-  | SPI2    | NSS   | PB9     | AF5 |       |       |           |           |
-  |         |       | PB12    |     |       |       |           |           |
-  |         |       | PI0     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | SCLK  | PB10    |     |       |       |           |           |
-  |         |       | PB13    |     |       |       |           |           |
-  |         |       | PI1     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | MISO  | PC2     |     |       |       |           |           |
-  |         |       | PB14    |     |       |       |           |           |
-  |         |       | PI2     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | MOSI  | PC3     |     |       |       |           |           |
-  |         |       | PB15    |     |       |       |           |           |
-  |         |       | PI3     |     |       |       |           |           |
-  |         +-------+---------+     +-------+-------+-----------+-----------+
-  |         |       |         |     | RX    | DMA1  | CHANNEL0  | STREAM3   |
-  |         +-------+---------+     +-------+       |           +-----------+
-  |         |       |         |     | TX    |       |           | STREAM4   |
-  +=========+=======+=========+=====+=======+=======+===========+===========+
-  | SPI3    | NSS   | PA4     | AF5 |       |       |           |           |
-  |         |       | PA15    |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | SCLK  | PC10    |     |       |       |           |           |
-  |         |       | PB3     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | MISO  | PC11    |     |       |       |           |           |
-  |         |       | PB4     |     |       |       |           |           |
-  |         +-------+---------+     |       |       |           |           |
-  |         | MOSI  | PC12    |     |       |       |           |           |
-  |         |       | PB5     |     |       |       |           |           |
-  |         +-------+---------+     +-------+-------+-----------+-----------+
-  |         |       |         |     | RX    | DMA1  | CHANNEL0  | STREAM0   |
-  |         |       |         |     |       |       |           | STREAM2   |
-  |         +-------+---------+     +-------+       |           +-----------+
-  |         |       |         |     | TX    |       |           | STREAM5   |
-  |         |       |         |     |       |       |           | STREAM7   |
-  +=========+=======+=========+=====+=======+=======+===========+===========+
-
-*******************************************************************************/
-
-/* Defined Number of UART Modules to Enable ***********************************/
-#define I2_MAX_NUM_SPI_CONTEXT            ( 3 )
-#define I2_ENABLE_SPI1_CONTEXT
-#define I2_ENABLE_SPI2_CONTEXT
-#define I2_ENABLE_SPI3_CONTEXT
+/**
+ * @defgroup I2_ENABLE_SPI_CONTEXT SPI peripherals enabling.
+ * Enables any number of SPI context among all available SPI peripherals.
+ *
+ * @{
+ */
+#define I2_MAX_NUM_SPI_CONTEXT    ( 3 ) /**< Count of SPI context to enable   */
+#define I2_ENABLE_SPI1_CONTEXT          /**< Define to enable SPI1 context    */
+#define I2_ENABLE_SPI2_CONTEXT          /**< Define to enable SPI2 context    */
+#define I2_ENABLE_SPI3_CONTEXT          /**< Define to enable SPI3 context    */
+/** @} */ /* I2_ENABLE_SPI_CONTEXT */
 
 /* SPI1 CONFIGURATION SELECTION ***********************************************/
-/* Definition for SPI1 Pins, to be defined as < PORT, PIN > */
-#define SPI1_SCLK_GPIO_CONFIG               GPIOB, GPIO_PIN_3
-#define SPI1_MISO_GPIO_CONFIG               GPIOB, GPIO_PIN_4
-#define SPI1_MOSI_GPIO_CONFIG               GPIOB, GPIO_PIN_5
-/* Definition for SPI1 DMA, to be defined as < CHANNEL, STREAM > */
-#define SPI1_RX_DMA_CONFIG                  DMA_CHANNEL_3, DMA2_Stream2
-#define SPI1_TX_DMA_CONFIG                  DMA_CHANNEL_3, DMA2_Stream3
-/* Definition for SPI1 NVIC */
-#define SPI1_DMA_RX_IRQn                    DMA2_Stream2_IRQn
-#define SPI1_DMA_TX_IRQn                    DMA2_Stream3_IRQn
-#define SPI1_DMA_RX_IRQHandler              DMA2_Stream2_IRQHandler
-#define SPI1_DMA_TX_IRQHandler              DMA2_Stream3_IRQHandler
+#if defined ( I2_ENABLE_SPI1_CONTEXT )
+/**
+ * @defgroup I2_SPI1_CONFIG SPI1 configurations.
+ * Configuration settings for SPI1.
+ *
+ * @{
+ */
+/**
+ * @defgroup I2_SPI1_GPIO SPI1 pin configurations.
+ * Definition for SPI1 Pins, to be defined as < PORT, PIN >.
+ *
+ * @{
+ */
+#define SPI1_SCLK_GPIO_CONFIG   GPIOB, GPIO_PIN_3   /**< SPI1 SCKL pin config */
+#define SPI1_MISO_GPIO_CONFIG   GPIOB, GPIO_PIN_4   /**< SPI1 MISO pin config */
+#define SPI1_MOSI_GPIO_CONFIG   GPIOB, GPIO_PIN_5   /**< SPI1 MOSI pin config */
+/** @} */ /* I2_SPI1_GPIO */
+/**
+ * @defgroup I2_SPI1_DMA SPI1 DMA configurations.
+ * Definition for SPI1 DMA, to be defined as < CHANNEL, STREAM >.
+ *
+ * @{
+ */
+#define SPI1_RX_DMA_CONFIG      DMA_CHANNEL_3, DMA2_Stream2   /**< SPI1 RxDMA */
+#define SPI1_TX_DMA_CONFIG      DMA_CHANNEL_3, DMA2_Stream3   /**< SPI1 TxDMA */
+/** @} */ /* I2_SPI1_DMA */
+/**
+ * @defgroup I2_SPI1_DMA_IRQn SPI1 interrupt configurations.
+ * Definition for SPI1 DMA interrupt handlers.
+ *
+ * @{
+ */
+#define SPI1_DMA_RX_IRQn        DMA2_Stream2_IRQn       /**< SPI1 DMA RX IRQn */
+#define SPI1_DMA_TX_IRQn        DMA2_Stream3_IRQn       /**< SPI1 DMA TX IRQn */
+#define SPI1_DMA_RX_IRQHandler  DMA2_Stream2_IRQHandler /**< SPI1 RX Handler  */
+#define SPI1_DMA_TX_IRQHandler  DMA2_Stream3_IRQHandler /**< SPI1 TX Handler  */
+/** @} */ /* I2_SPI1_DMA_IRQn */
+/** @} */ /* I2_SPI1_CONFIG */
+#endif    /* I2_ENABLE_SPI1_CONTEXT */
 /******************************************************************************/
 
 /* SPI2 CONFIGURATION SELECTION ***********************************************/
-/* Definition for SPI2 Pins, to be defined as < PORT, PIN > */
-#define SPI2_SCLK_GPIO_CONFIG               GPIOI, GPIO_PIN_1
-#define SPI2_MISO_GPIO_CONFIG               GPIOI, GPIO_PIN_2
-#define SPI2_MOSI_GPIO_CONFIG               GPIOI, GPIO_PIN_3
-/* Definition for SPI2 DMA, to be defined as < CHANNEL, STREAM > */
-#define SPI2_RX_DMA_CONFIG                  DMA_CHANNEL_0, DMA1_Stream3
-#define SPI2_TX_DMA_CONFIG                  DMA_CHANNEL_0, DMA1_Stream4
-/* Definition for SPI2 NVIC */
-#define SPI2_DMA_RX_IRQn                    DMA1_Stream3_IRQn
-#define SPI2_DMA_TX_IRQn                    DMA1_Stream4_IRQn
-#define SPI2_DMA_RX_IRQHandler              DMA1_Stream3_IRQHandler
-#define SPI2_DMA_TX_IRQHandler              DMA1_Stream4_IRQHandler
+#if defined ( I2_ENABLE_SPI2_CONTEXT )
+/**
+ * @defgroup I2_SPI2_CONFIG SPI2 configurations.
+ * Configuration settings for SPI2.
+ *
+ * @{
+ */
+/**
+ * @defgroup I2_SPI2_GPIO SPI2 pin configurations.
+ * Definition for SPI2 Pins, to be defined as < PORT, PIN >.
+ *
+ * @{
+ */
+#define SPI2_SCLK_GPIO_CONFIG   GPIOI, GPIO_PIN_1   /**< SPI2 SCKL pin config */
+#define SPI2_MISO_GPIO_CONFIG   GPIOI, GPIO_PIN_2   /**< SPI2 MISO pin config */
+#define SPI2_MOSI_GPIO_CONFIG   GPIOI, GPIO_PIN_3   /**< SPI2 MOSI pin config */
+/** @} */ /* I2_SPI2_GPIO */
+/**
+ * @defgroup I2_SPI2_DMA SPI2 DMA configurations.
+ * Definition for SPI2 DMA, to be defined as < CHANNEL, STREAM >.
+ *
+ * @{
+ */
+#define SPI2_RX_DMA_CONFIG      DMA_CHANNEL_0, DMA1_Stream3 /**< SPI2 RX DMA  */
+#define SPI2_TX_DMA_CONFIG      DMA_CHANNEL_0, DMA1_Stream4 /**< SPI2 TX DMA  */
+/** @} */ /* I2_SPI2_DMA */
+/**
+ * @defgroup I2_SPI2_DMA_IRQn SPI2 interrupt configurations.
+ * Definition for SPI2 DMA interrupt handlers.
+ *
+ * @{
+ */
+#define SPI2_DMA_RX_IRQn        DMA1_Stream3_IRQn       /**< SPI2 DMA RX IRQn */
+#define SPI2_DMA_TX_IRQn        DMA1_Stream4_IRQn       /**< SPI2 DMA TX IRQn */
+#define SPI2_DMA_RX_IRQHandler  DMA1_Stream3_IRQHandler /**< SPI2 RX Handler  */
+#define SPI2_DMA_TX_IRQHandler  DMA1_Stream4_IRQHandler /**< SPI2 TX Handler  */
+/** @} */ /* I2_SPI2_DMA_IRQn */
+/** @} */ /* I2_SPI2_CONFIG */
+#endif    /* I2_ENABLE_SPI2_CONTEXT */
 /******************************************************************************/
 
 /* SPI3 CONFIGURATION SELECTION ***********************************************/
-/* Definition for SPI3 Pins, to be defined as < PORT, PIN > */
-#define SPI3_SCLK_GPIO_CONFIG               GPIOC, GPIO_PIN_10
-#define SPI3_MISO_GPIO_CONFIG               GPIOC, GPIO_PIN_11
-#define SPI3_MOSI_GPIO_CONFIG               GPIOC, GPIO_PIN_12
-/* Definition for SPI3 DMA, to be defined as < CHANNEL, STREAM > */
-#define SPI3_RX_DMA_CONFIG                  DMA_CHANNEL_0, DMA1_Stream2
-#define SPI3_TX_DMA_CONFIG                  DMA_CHANNEL_0, DMA1_Stream7
-/* Definition for SPI3 NVIC */
-#define SPI3_DMA_RX_IRQn                    DMA1_Stream2_IRQn
-#define SPI3_DMA_TX_IRQn                    DMA1_Stream7_IRQn
-#define SPI3_DMA_RX_IRQHandler              DMA1_Stream2_IRQHandler
-#define SPI3_DMA_TX_IRQHandler              DMA1_Stream7_IRQHandler
+#if defined ( I2_ENABLE_SPI3_CONTEXT )
+/**
+ * @defgroup I2_SPI3_CONFIG SPI3 configurations.
+ * Configuration settings for SPI3.
+ *
+ * @{
+ */
+/**
+ * @defgroup I2_SPI3_GPIO SPI3 pin configurations.
+ * Definition for SPI3 Pins, to be defined as < PORT, PIN >.
+ *
+ * @{
+ */
+#define SPI3_SCLK_GPIO_CONFIG   GPIOC, GPIO_PIN_10  /**< SPI3 SCKL pin config */
+#define SPI3_MISO_GPIO_CONFIG   GPIOC, GPIO_PIN_11  /**< SPI3 MISO pin config */
+#define SPI3_MOSI_GPIO_CONFIG   GPIOC, GPIO_PIN_12  /**< SPI3 MOSI pin config */
+/** @} */ /* I2_SPI3_GPIO */
+/**
+ * @defgroup I2_SPI3_DMA SPI3 DMA configurations.
+ * Definition for SPI3 DMA, to be defined as < CHANNEL, STREAM >.
+ *
+ * @{
+ */
+#define SPI3_RX_DMA_CONFIG      DMA_CHANNEL_0, DMA1_Stream2 /**< SPI3 RX DMA  */
+#define SPI3_TX_DMA_CONFIG      DMA_CHANNEL_0, DMA1_Stream7 /**< SPI3 TX DMA  */
+/** @} */ /* I2_SPI3_DMA */
+/**
+ * @defgroup I2_SPI3_DMA_IRQn SPI3 interrupt configurations.
+ * Definition for SPI3 DMA interrupt handlers.
+ *
+ * @{
+ */
+#define SPI3_DMA_RX_IRQn        DMA1_Stream2_IRQn       /**< SPI3 DMA RX IRQn */
+#define SPI3_DMA_TX_IRQn        DMA1_Stream7_IRQn       /**< SPI3 DMA TX IRQn */
+#define SPI3_DMA_RX_IRQHandler  DMA1_Stream2_IRQHandler /**< SPI3 RX Handler  */
+#define SPI3_DMA_TX_IRQHandler  DMA1_Stream7_IRQHandler /**< SPI3 TX Handler  */
+/** @} */ /* I2_SPI3_DMA_IRQn */
+/** @} */ /* I2_SPI3_CONFIG */
+#endif    /* I2_ENABLE_SPI3_CONTEXT */
 /******************************************************************************/
 
-/*
- * This defines the attributes of spi hardware controller. Note that
- * a spi hardware controller can be shared by many spi device instances
- * with different chip select gpio. The details of the controller attributes
+/**
+ * @defgroup i2_spi_ctx_t SPI peripheral context.
+ * This defines the attributes of SPI hardware controller. Note that
+ * a SPI hardware controller can be shared by many SPI device instances
+ * with different chip select GPIO. The details of the controller attributes
  * are statically defined in the spi.c. We do not have any need to dynamically
  * configure them yet nor do we want to do that as they might be shared.
+ *
+ * @{
  */
+/** @brief SPI context */
 typedef struct {
-  const char*           ctx_name;
-  i2_gpio_inst_t        SCLK;
-  i2_gpio_inst_t        MISO;
-  i2_gpio_inst_t        MOSI;
-  int32_t               hal_mode;
-  bool                  initialized;
-  SPI_TypeDef*          baseaddr;
-  uint32_t              dma_rx_channel;
-  DMA_Stream_TypeDef*   dma_rx_stream;
-  uint32_t              dma_rx_priority;
-  IRQn_Type             dma_rx_irqn;
-  uint32_t              dma_tx_channel;
-  DMA_Stream_TypeDef*   dma_tx_stream;
-  uint32_t              dma_tx_priority;
-  IRQn_Type             dma_tx_irqn;
-  SPI_HandleTypeDef     spi;
-  DMA_HandleTypeDef     hdma_rx;
-  DMA_HandleTypeDef     hdma_tx;
+  const char*           ctx_name;         /**< SPI context name               */
+  i2_gpio_inst_t        SCLK;             /**< GPIO pin for SPI SCLK          */
+  i2_gpio_inst_t        MISO;             /**< GPIO pin for SPI MISO          */
+  i2_gpio_inst_t        MOSI;             /**< GPIO pin for SPI MOSI          */
+  int32_t               hal_mode;         /**< SPI HAL operational mode       */
+  bool                  initialized;      /**< SPI initialization flag        */
+  SPI_TypeDef*          baseaddr;         /**< SPI peripheral base address    */
+  uint32_t              dma_rx_channel;   /**< SPI DMA RX channel             */
+  DMA_Stream_TypeDef*   dma_rx_stream;    /**< SPI DMA RX stream              */
+  uint32_t              dma_rx_priority;  /**< SPI DMA RX channel priority    */
+  IRQn_Type             dma_rx_irqn;      /**< SPI DMA RX interrupt request   */
+  uint32_t              dma_tx_channel;   /**< SPI DMS TX channel             */
+  DMA_Stream_TypeDef*   dma_tx_stream;    /**< SPI DMA TX stream              */
+  uint32_t              dma_tx_priority;  /**< SPI DMA TX channel priority    */
+  IRQn_Type             dma_tx_irqn;      /**< SPI DMA RX interrupt request   */
+  SPI_HandleTypeDef     spi;              /**< SPI peripheral handler         */
+  DMA_HandleTypeDef     hdma_rx;          /**< SPI DMA handler for RX channel */
+  DMA_HandleTypeDef     hdma_tx;          /**< SPI DMA handler for TX channel */
  #if defined ( ENABLE_RTOS_AWARE_HAL)
-  SemaphoreHandle_t     mutex;
-  SemaphoreHandle_t     sem;
+  SemaphoreHandle_t     mutex;            /**< SPI context mutex              */
+  SemaphoreHandle_t     sem;              /**< SPI context semaphore          */
 #endif /* ENABLE_RTOS_AWARE_HAL */
-  __IO ITStatus         status;
+  __IO ITStatus         status;           /**< SPI interrupt status           */
 } i2_spi_ctx_t;
+/** @} */ /* i2_spi_ctx_t */
 
+/** @brief SPI Context used in application */
 static i2_spi_ctx_t i2_spi_ctx_table[I2_MAX_NUM_SPI_CONTEXT] = {
 #if defined ( I2_ENABLE_SPI1_CONTEXT )
   {
@@ -227,23 +310,33 @@ static i2_spi_ctx_t i2_spi_ctx_table[I2_MAX_NUM_SPI_CONTEXT] = {
 #endif /* I2_ENABLE_SPI3_CONTEXT */
 };
 
-/*
- * We can have more number of SPI device instances
- * than the number of SPI controllers
+/**
+ * @brief Number of SPI instances to enable.
+ * @details We can have more number of SPI device instances
+ *          than the number of SPI controllers.
  */
 #define I2_MAX_NUM_SPI_INSTANCE    (3)
+/** @brief Table to maintain all enabled SPI instances */
 static i2_spi_inst_t *i2_spi_inst_table[I2_MAX_NUM_SPI_INSTANCE];
 
 #if defined ( I2_ENABLE_SPI1_CONTEXT )
-static SPI_HandleTypeDef *spi1 = NULL;
+static SPI_HandleTypeDef *spi1 = NULL;              /**< SPI1 control handler */
 #endif /* I2_ENABLE_SPI1_CONTEXT */
 #if defined ( I2_ENABLE_SPI2_CONTEXT )
-static SPI_HandleTypeDef *spi2 = NULL;
+static SPI_HandleTypeDef *spi2 = NULL;              /**< SPI2 control handler */
 #endif /* I2_ENABLE_SPI2_CONTEXT */
 #if defined ( I2_ENABLE_SPI3_CONTEXT )
-static SPI_HandleTypeDef *spi3 = NULL;
+static SPI_HandleTypeDef *spi3 = NULL;              /**< SPI3 control handler */
 #endif /* I2_ENABLE_SPI3_CONTEXT */
 
+/* Private functions ---------------------------------------------------------*/
+/**
+ * @brief   SPI instance to context converter.
+ * @details Get SPI context from corresponding instance.
+ *
+ * @param[in] *name       SPI instance name.
+ * @return  SPI context object.
+ */
 static i2_spi_ctx_t* spi_inst_to_ctx(const char *name)
 {
   int32_t i;
@@ -256,6 +349,13 @@ static i2_spi_ctx_t* spi_inst_to_ctx(const char *name)
   return NULL;
 }
 
+/**
+ * @brief   SPI handle to context converter.
+ * @details Get SPI context from corresponding HAL handle.
+ *
+ * @param[in] *hspi       SPI HAL handle.
+ * @return  SPI context object.
+ */
 static i2_spi_ctx_t* spi_handle_to_ctx(SPI_HandleTypeDef *hspi)
 {
   int32_t i;
@@ -268,6 +368,14 @@ static i2_spi_ctx_t* spi_handle_to_ctx(SPI_HandleTypeDef *hspi)
   return NULL;
 }
 
+/* Public functions ----------------------------------------------------------*/
+/**
+ * @brief   SPI initialization.
+ * @details Initializes a SPI instance along with GPIO, DMA and interrupts.
+ *
+ * @param[in] *inst       SPI instance to initialize.
+ * @return  Initialization error code @ref I2_ERROR.
+ */
 i2_error i2_spi_init(i2_spi_inst_t *inst)
 {
   i2_error retval = I2_SUCCESS;
@@ -371,7 +479,7 @@ i2_error i2_spi_init(i2_spi_inst_t *inst)
 
   /* DMA RX Config */
   if ( ctx->hal_mode == DMA_MODE) {
-  /*##### Configure the DMA streams ##########################################*/
+    /*##### Configure the DMA streams ########################################*/
     /* Configure the DMA handler for Transmission process */
     ctx->hdma_rx.Instance                 = ctx->dma_rx_stream;
     ctx->hdma_rx.Init.Channel             = ctx->dma_rx_channel;
@@ -412,7 +520,7 @@ i2_error i2_spi_init(i2_spi_inst_t *inst)
     /* Associate the initialized DMA handle to the the SPI handle */
     __HAL_LINKDMA(hspi, hdmatx, ctx->hdma_tx);
 
-    /*##### Configure the NVIC for DMA #########################################*/
+    /*##### Configure the NVIC for DMA #######################################*/
     /* NVIC configuration for DMA transfer complete interrupt */
     HAL_NVIC_SetPriority( ctx->dma_rx_irqn, SPI_DMA_PREEMPTION_PRIORITY,
                           SPI_DMA_SUB_PRIORITY);
@@ -426,7 +534,6 @@ i2_error i2_spi_init(i2_spi_inst_t *inst)
 
   HAL_NVIC_SetPriority(irqn, SPI_PREEMPTION_PRIORITY, SPI_SUB_PRIORITY);
   HAL_NVIC_EnableIRQ(irqn);
-
 
   /*##### Configure the SPI peripheral #######################################*/
   /* Set the SPI parameters */
@@ -463,6 +570,13 @@ i2_error i2_spi_init(i2_spi_inst_t *inst)
   return retval;
 }
 
+/**
+ * @brief   SPI deinitialization.
+ * @details Deinitializes and SPI instance.
+ *
+ * @param[in] *inst         SPI instance to deinitialize.
+ * @return  Deinitialization error code @ref I2_ERROR.
+ */
 i2_error i2_spi_deinit(i2_spi_inst_t *inst)
 {
   i2_spi_ctx_t *ctx;
@@ -522,6 +636,13 @@ i2_error i2_spi_deinit(i2_spi_inst_t *inst)
   return I2_SUCCESS;
 }
 
+/**
+ * @brief   SPI instance get.
+ * @details Returns SPI instance object from name.
+ *
+ * @param[in] *inst_name       Name of instance to get.
+ * @return  SPI instance object corresponding to passed name.
+ */
 i2_spi_inst_t* i2_spi_inst_get(char *inst_name)
 {
   int32_t i;
@@ -535,6 +656,17 @@ i2_spi_inst_t* i2_spi_inst_get(char *inst_name)
   return NULL;
 }
 
+/**
+ * @brief   SPI setting configuration.
+ * @details Configures various settings for SPI peripheral.
+ *
+ * @param[in] *ctx        SPI context.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 static i2_error spi_config(i2_spi_ctx_t *ctx, i2_spi_data_width_t data_width,
                            i2_spi_clock_speed_t clk_speed,
                            i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit)
@@ -640,6 +772,29 @@ static i2_error spi_config(i2_spi_ctx_t *ctx, i2_spi_data_width_t data_width,
   return retval;
 }
 
+/**
+ * @brief   SPI send / receive.
+ * @details Transmits and receives data on SPI bus, with CS already asserted.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @param[in] *txbuf      If null, then this function will only receive data on
+ *                        SPI bus, and put it in rxbuf, else this buffer will be
+ *                        transmitted on SPI bus.
+ * @param[out] *rxbuf     If null, then this function will only transmit data
+ *                        form txbuf on SPI bus, else this buffer will be used
+ *                        to receive data on SPI bus.
+ * @param[in] size        Amount of data to be transmitted / received.
+ * @param[in] timeout     SPI bus HAL timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ *
+ * @note    If both txbuf and rxbuf are non null, then txbuf will be transmitted
+ *          TX pin and on same clock data will be received on RX pin and will be
+ *          put in rxbuf.
+ */
 i2_error i2_spi_txrx_raw( i2_spi_inst_t *inst, i2_spi_data_width_t data_width,
                           i2_spi_clock_speed_t clk_speed,
                           i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit,
@@ -719,6 +874,30 @@ i2_error i2_spi_txrx_raw( i2_spi_inst_t *inst, i2_spi_data_width_t data_width,
   return err;
 }
 
+/**
+ * @brief   SPI send / receive.
+ * @details Transmits and receives data on SPI bus, This function will asserts
+ *          and deasserts the CS pin.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @param[in] *txbuf      If null, then this function will only receive data on
+ *                        SPI bus, and put it in rxbuf, else this buffer will be
+ *                        transmitted on SPI bus.
+ * @param[out] *rxbuf     If null, then this function will only transmit data
+ *                        form txbuf on SPI bus, else this buffer will be used
+ *                        to receive data on SPI bus.
+ * @param[in] size        Amount of data to be transmitted / received.
+ * @param[in] timeout     SPI bus HAL timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ *
+ * @note    If both txbuf and rxbuf are non null, then txbuf will be transmitted
+ *          TX pin and on same clock data will be received on RX pin and will be
+ *          put in rxbuf.
+ */
 i2_error i2_spi_txrx( i2_spi_inst_t *inst, i2_spi_data_width_t data_width,
                       i2_spi_clock_speed_t clk_speed,
                       i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit,
@@ -761,6 +940,21 @@ i2_error i2_spi_txrx( i2_spi_inst_t *inst, i2_spi_data_width_t data_width,
   return err;
 }
 
+/**
+ * @brief   SPI send.
+ * @details Transmits data on SPI bus, This function will asserts
+ *          and deasserts the CS pin.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @param[in] *txbuf      This buffer will be transmitted on SPI bus.
+ * @param[in] size        Amount of data to be transmitted.
+ * @param[in] timeout     SPI bus HAL timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 i2_error i2_spi_tx( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                     i2_spi_clock_speed_t clk_speed,
                     i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit,
@@ -770,6 +964,21 @@ i2_error i2_spi_tx( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                       first_bit, txbuf, NULL, size, timeout);
 }
 
+/**
+ * @brief   SPI send.
+ * @details Transmits data on SPI bus, This function will not asserts
+ *          and deasserts the CS pin.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @param[in] *txbuf      This buffer will be transmitted on SPI bus.
+ * @param[in] size        Amount of data to be transmitted.
+ * @param[in] timeout     SPI bus HAL timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 i2_error i2_spi_tx_raw( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                         i2_spi_clock_speed_t clk_speed,
                         i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit,
@@ -779,6 +988,21 @@ i2_error i2_spi_tx_raw( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                           first_bit, txbuf, NULL, size, timeout);
 }
 
+/**
+ * @brief   SPI receive.
+ * @details Receives data on SPI bus, This function will asserts
+ *          and deasserts the CS pin.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @param[out] *rxbuf     This buffer will be used to receive data on SPI bus.
+ * @param[in] size        Amount of data to be received.
+ * @param[in] timeout     SPI bus HAL timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 i2_error i2_spi_rx( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                     i2_spi_clock_speed_t clk_speed,
                     i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit,
@@ -788,6 +1012,21 @@ i2_error i2_spi_rx( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                       first_bit, NULL, rxbuf, size, timeout);
 }
 
+/**
+ * @brief   SPI receive.
+ * @details Receives data on SPI bus, This function will not asserts
+ *          and deasserts the CS pin.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] data_width  Size of data bits for SPI @ref i2_spi_data_width_t.
+ * @param[in] clk_speed   SPI clock speed @ref i2_spi_clock_speed_t.
+ * @param[in] spi_mode    SPI communication mode @ref i2_spi_mode_t.
+ * @param[in] first_bit   Communication start bit @ref i2_spi_first_bit_t.
+ * @param[out] *rxbuf     This buffer will be used to receive data on SPI bus.
+ * @param[in] size        Amount of data to be received.
+ * @param[in] timeout     SPI bus HAL timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 i2_error i2_spi_rx_raw( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                         i2_spi_clock_speed_t clk_speed,
                         i2_spi_mode_t spi_mode, i2_spi_first_bit_t first_bit,
@@ -797,6 +1036,14 @@ i2_error i2_spi_rx_raw( i2_spi_inst_t *inst,  i2_spi_data_width_t data_width,
                           first_bit, NULL, rxbuf, size, timeout);
 }
 
+/**
+ * @brief   SPI bus assert.
+ * @details Asserts the CS pin of SPI instance.
+ *
+ * @param[in] *inst       SPI instance.
+ * @param[in] timeout     RTOS wait for MUTEX timeout.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 i2_error i2_spi_cs_assert(i2_spi_inst_t *inst, uint32_t timeout)
 {
   i2_spi_ctx_t *ctx;
@@ -824,6 +1071,13 @@ i2_error i2_spi_cs_assert(i2_spi_inst_t *inst, uint32_t timeout)
   return I2_SUCCESS;
 }
 
+/**
+ * @brief   SPI bus deassert.
+ * @details Desserts the CS pin of SPI instance.
+ *
+ * @param[in] *inst       SPI instance.
+ * @return  Execution error code @ref I2_ERROR.
+ */
 i2_error i2_spi_cs_deassert(i2_spi_inst_t *inst)
 {
   i2_spi_ctx_t *ctx;
@@ -850,16 +1104,34 @@ i2_error i2_spi_cs_deassert(i2_spi_inst_t *inst)
 }
 
 #if defined ( I2_ENABLE_SPI1_CONTEXT )
+/**
+ * @brief   SPI1 interrupt Handler.
+ * @details Generic interrupt handler for SPI1.
+ *
+ * @return  None.
+ */
 void SPI1_IRQHandler(void)
 {
   HAL_SPI_IRQHandler(spi1);
 }
 
+/**
+ * @brief   SPI1 DMA receive interrupt Handler.
+ * @details DMA receive interrupt handler for SPI1.
+ *
+ * @return  None.
+ */
 void SPI1_DMA_RX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(spi1->hdmarx);
 }
 
+/**
+ * @brief   SPI1 DMA transmit interrupt Handler.
+ * @details DMA transmit interrupt handler for SPI1.
+ *
+ * @return  None.
+ */
 void SPI1_DMA_TX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(spi1->hdmatx);
@@ -867,16 +1139,34 @@ void SPI1_DMA_TX_IRQHandler(void)
 #endif /* I2_ENABLE_SPI1_CONTEXT */
 
 #if defined ( I2_ENABLE_SPI2_CONTEXT )
+/**
+ * @brief   SPI2 interrupt Handler.
+ * @details Generic interrupt handler for SPI2.
+ *
+ * @return  None.
+ */
 void SPI2_IRQHandler(void)
 {
   HAL_SPI_IRQHandler(spi2);
 }
 
+/**
+ * @brief   SPI2 DMA receive interrupt Handler.
+ * @details DMA receive interrupt handler for SPI2.
+ *
+ * @return  None.
+ */
 void SPI2_DMA_RX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(spi2->hdmarx);
 }
 
+/**
+ * @brief   SPI2 DMA transmit interrupt Handler.
+ * @details DMA transmit interrupt handler for SPI2.
+ *
+ * @return  None.
+ */
 void SPI2_DMA_TX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(spi2->hdmatx);
@@ -884,22 +1174,47 @@ void SPI2_DMA_TX_IRQHandler(void)
 #endif /* I2_ENABLE_SPI2_CONTEXT */
 
 #if defined ( I2_ENABLE_SPI3_CONTEXT )
+/**
+ * @brief   SPI3 interrupt Handler.
+ * @details Generic interrupt handler for SPI3.
+ *
+ * @return  None.
+ */
 void SPI3_IRQHandler(void)
 {
   HAL_SPI_IRQHandler(spi3);
 }
 
+/**
+ * @brief   SPI3 DMA receive interrupt Handler.
+ * @details DMA receive interrupt handler for SPI3.
+ *
+ * @return  None.
+ */
 void SPI3_DMA_RX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(spi3->hdmarx);
 }
 
+/**
+ * @brief   SPI3 DMA transmit interrupt Handler.
+ * @details DMA transmit interrupt handler for SPI3.
+ *
+ * @return  None.
+ */
 void SPI3_DMA_TX_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(spi3->hdmatx);
 }
 #endif /* I2_ENABLE_SPI3_CONTEXT */
 
+/**
+ * @brief   SPI completion callback.
+ * @details System callback for SPI transmission and reception completion.
+ *
+ * @param[in] *hspi     SPI handler.
+ * @return  None.
+ */
 static void spi_cplt_callback(SPI_HandleTypeDef *hspi)
 {
 #if defined ( ENABLE_RTOS_AWARE_HAL )
@@ -916,21 +1231,49 @@ static void spi_cplt_callback(SPI_HandleTypeDef *hspi)
   }
 }
 
+/**
+ * @brief   SPI DMA Transmit and receive compete callback.
+ * @details System callback for DMA transmission and reception completion.
+ *
+ * @param[in] *hspi     SPI handler.
+ * @return  None.
+ */
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
   spi_cplt_callback(hspi);
 }
 
+/**
+ * @brief   SPI DMA Transmit compete callback.
+ * @details System callback for DMA transmission completion.
+ *
+ * @param[in] *hspi     SPI handler.
+ * @return  None.
+ */
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
   spi_cplt_callback(hspi);
 }
 
+/**
+ * @brief   SPI DMA receive compete callback.
+ * @details System callback for DMA reception completion.
+ *
+ * @param[in] *hspi     SPI handler.
+ * @return  None.
+ */
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
   spi_cplt_callback(hspi);
 }
 
+/**
+ * @brief   SPI DMA error callback.
+ * @details System callback for error during DMA operations on SPI bus.
+ *
+ * @param[in] *hspi     SPI handler.
+ * @return  None.
+ */
 void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
 #if defined ( ENABLE_RTOS_AWARE_HAL )
@@ -947,4 +1290,4 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
   }
 }
 
-/************************ (C) COPYRIGHT iota2 ************END OF FILE**********/
+/************************ (C) COPYRIGHT iota2 ***[i2]*****END OF FILE**********/
